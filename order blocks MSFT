@@ -1,0 +1,42 @@
+//@version=6
+strategy("MSFT Verificador - Análisis de Esperanza", overlay=true, initial_capital=10000, default_qty_value=10, currency=currency.USD)
+
+// Candado global para evitar que una misma zona dispare múltiples entradas
+var int ultimo_id_msft = 0
+
+// --- SEÑAL 1: Compra 01-Feb (Activo/Mitigado) ---
+if ultimo_id_msft < 1 and time >= timestamp(2024, 02, 01, 0, 0)
+    strategy.entry("Long 1", strategy.long, limit=412.16, comment="OB Feb-01")
+    strategy.exit("Exit 1", "Long 1", limit=441.58, stop=396.54)
+    ultimo_id_msft := 1
+
+// --- SEÑAL 2: Compra 21-Jun (ROTO - Pérdida) ---
+if ultimo_id_msft < 2 and time >= timestamp(2024, 06, 21, 0, 0)
+    strategy.entry("Long 2", strategy.long, limit=457.25, comment="OB Jun-21 ROTO")
+    strategy.exit("Exit 2", "Long 2", limit=490.94, stop=438.01)
+    ultimo_id_msft := 2
+
+// --- SEÑAL 3: Venta 24-Jul (Activo) ---
+if ultimo_id_msft < 3 and time >= timestamp(2024, 07, 24, 0, 0)
+    strategy.entry("Short 3", strategy.short, limit=412.02, comment="OB Jul-24")
+    strategy.exit("Exit 3", "Short 3", limit=375.39, stop=436.37)
+    ultimo_id_msft := 3
+
+// --- SEÑAL 4: Compra 06-Ago (Activo/Mitigado) ---
+if ultimo_id_msft < 4 and time >= timestamp(2024, 08, 06, 0, 0)
+    strategy.entry("Long 4", strategy.long, limit=409.98, comment="OB Aug-06")
+    strategy.exit("Exit 4", "Long 4", limit=442.61, stop=390.46)
+    ultimo_id_msft := 4
+
+// --- SEÑAL 5: Compra 04-Dic (ROTO - Pérdida) ---
+if ultimo_id_msft < 5 and time >= timestamp(2024, 12, 04, 0, 0)
+    strategy.entry("Long 5", strategy.long, limit=445.94, comment="OB Dec-04 ROTO")
+    strategy.exit("Exit 5", "Long 5", limit=477.18, stop=428.67)
+    ultimo_id_msft := 5
+
+// --- VISUALIZACIÓN DE ZONAS CLAVE ---
+if time >= timestamp(2024, 06, 21, 0, 0) and time[1] < timestamp(2024, 06, 21, 0, 0)
+    box.new(bar_index, 467.56, bar_index + 20, 446.95, bgcolor=color.new(color.orange, 80), text="OB ROTO JUNIO")
+
+if time >= timestamp(2024, 12, 04, 0, 0) and time[1] < timestamp(2024, 12, 04, 0, 0)
+    box.new(bar_index, 454.46, bar_index + 20, 437.42, bgcolor=color.new(color.orange, 80), text="OB ROTO DICIEMBRE")
