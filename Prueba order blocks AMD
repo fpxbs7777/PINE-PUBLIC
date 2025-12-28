@@ -1,0 +1,39 @@
+//@version=6
+strategy("AMD Verificador Final - Sin Errores", overlay=true, initial_capital=10000, default_qty_value=10, currency=currency.USD)
+
+// Candado para no repetir operaciones
+var int ultimo_id_operado = 0
+
+// --- SEÑAL 1: Compra 18-Ene ---
+if ultimo_id_operado < 1 and time >= timestamp(2024, 01, 18, 0, 0)
+    strategy.entry("Long 1", strategy.long, limit=171.50, comment="Bloque 1")
+    strategy.exit("Exit 1", "Long 1", limit=189.35, stop=158.60)
+    ultimo_id_operado := 1
+
+// --- SEÑAL 2: Compra 01-Feb ---
+if ultimo_id_operado < 2 and time >= timestamp(2024, 02, 01, 0, 0)
+    strategy.entry("Long 2", strategy.long, limit=173.29, comment="Bloque 2")
+    strategy.exit("Exit 2", "Long 2", limit=187.63, stop=164.52)
+    ultimo_id_operado := 2
+
+// --- SEÑAL 3: Compra 29-Feb ---
+if ultimo_id_operado < 3 and time >= timestamp(2024, 02, 29, 0, 0)
+    strategy.entry("Long 3", strategy.long, limit=201.95, comment="Bloque 3")
+    strategy.exit("Exit 3", "Long 3", limit=221.95, stop=188.46)
+    ultimo_id_operado := 3
+
+// --- SEÑAL 4: Venta 08-Mar (LA CLAVE) ---
+if ultimo_id_operado < 4 and time >= timestamp(2024, 03, 08, 0, 0)
+    strategy.entry("Short 4", strategy.short, limit=195.11, comment="Bloque 4")
+    strategy.exit("Exit 4", "Short 4", limit=169.75, stop=211.54)
+    ultimo_id_operado := 4
+
+// --- SEÑAL 5: Venta 30-Oct ---
+if ultimo_id_operado < 5 and time >= timestamp(2024, 10, 30, 0, 0)
+    strategy.entry("Short 5", strategy.short, limit=145.26, comment="Bloque 5")
+    strategy.exit("Exit 5", "Short 5", limit=133.67, stop=152.82)
+    ultimo_id_operado := 5
+
+// Dibujo de rectángulos para verificar visualmente
+if time >= timestamp(2024, 03, 08, 0, 0) and time[1] < timestamp(2024, 03, 08, 0, 0)
+    box.new(bar_index, 211.54, bar_index + 20, 178.68, bgcolor=color.new(color.red, 80), border_color=color.red, text="ZONA VENTA MARZO")
