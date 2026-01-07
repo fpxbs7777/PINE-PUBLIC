@@ -1,17 +1,14 @@
-"""
-Análisis Comparativo Completo: Portafolio de Clientes vs Sectores
-Con instalación automática de dependencias y corrección de errores de cálculo
 
-CORRECCIONES IMPLEMENTADAS:
-1. Recovery Rate corregido: Ahora usa EBIT/Pasivo Total (NO beneficio neto)
-2. Invested Capital validado correctamente en todos los casos
-3. Tax Rate con validación y límites razonables
-4. Du Pont ROE con validación completa
-5. Todas las fórmulas verificadas contra estándares financieros
 
-Autor: Sistema de Análisis Financiero
-Fecha: 2026-01-07
-"""
+# ============================================================================
+# CONFIGURACIÓN DE CREDENCIALES IOL (COMPLETAR ANTES DE EJECUTAR)
+# ============================================================================
+
+# IMPORTANTE: Configurar con tus credenciales de InvertirOnline antes de ejecutar
+IOL_USERNAME = ""  # Ingresar tu email de IOL aquí
+IOL_PASSWORD = ""  # Ingresar tu contraseña de IOL aquí
+
+# ============================================================================
 
 import subprocess
 import sys
@@ -24,10 +21,10 @@ import os
 def instalar_dependencias():
     """Instala automáticamente todas las dependencias necesarias"""
     dependencias = [
+        'requests',      # Para IOL API
         'yfinance',
         'pandas',
         'numpy',
-        'requests',
         'matplotlib',
         'seaborn',
         'openpyxl',
@@ -60,6 +57,7 @@ instalar_dependencias()
 # IMPORTACIONES
 # ============================================================================
 
+import requests
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -73,46 +71,339 @@ warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-# Importar módulos de IOL
-sys.path.insert(0, str(Path(__file__).parent))
-try:
-    from iol_data import get_client
-    from iol_api import IOLClient
-    IOL_DISPONIBLE = True
-except Exception as e:
-    logger.warning(f"No se pudo importar módulos de IOL: {e}")
-    IOL_DISPONIBLE = False
-
 # ============================================================================
-# CONFIGURACIÓN DE SECTORES Y TICKERS REPRESENTATIVOS
+# MÓDULOS DE IOL INTEGRADOS (NO REQUIERE ARCHIVOS EXTERNOS)
 # ============================================================================
 
+import time
+import json
+
+class IOLClient:
+    """Cliente para interactuar con la API de InvertirOnline"""
+    
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.access_token = None
+        self.refresh_token = None
+        self.token_expiry = 0
+        self.base_url = "https://api.invertironline.com"
+
+    def obtener_tokens(self):
+        token_url = f'{self.base_url}/token'
+        payload = {
+            'username': self.username,
+            'password': self.password,
+            'grant_type': 'password'
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        try:
+            logger.info("Intentando autenticar con usuario: %s", self.username)
+            response = requests.post(token_url, data=payload, headers=headers)
+            if response.status_code == 200:
+                tokens = response.json()
+                self.access_token = tokens['access_token']
+                self.refresh_token = tokens['refresh_token']
+                self.token_expiry = time.time() + tokens.get('expires_in', 300)
+                print("Autenticación exitosa.")
+                return True
+            else:
+                logger.warning('Error en la solicitud de token: %s', response.status_code)
+                logger.debug('Detalle de respuesta token: %s', response.text)
+                return False
+        except Exception as e:
+            logger.exception('Excepción al obtener tokens: %s', e)
+            return False
+
+    def refrescar_token(self):
+        token_url = f'{self.base_url}/token'
+        payload = {
+            'refresh_token': self.refresh_token,
+            'grant_type': 'refresh_token'
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        try:
+            response = requests.post(token_url, data=payload, headers=headers)
+            if response.status_code == 200:
+                tokens = response.json()
+                self.access_token = tokens['access_token']
+                self.refresh_token = tokens['refresh_token']
+                self.token_expiry = time.time() + tokens.get('expires_in', 300)
+                return True
+            else:
+                logger.warning('Error al refrescar token: %s', response.status_code)
+                logger.debug('Detalle refrescar token: %s', response.text)
+                return False
+        except Exception as e:
+            logger.exception('Excepción al refrescar token: %s', e)
+            return False
+
+    def _ensure_token(self):
+        if not self.access_token:
+            return self.obtener_tokens()
+        if time.time() > self.token_expiry - 60:
+            if not self.refrescar_token():
+                return self.obtener_tokens()
+        return True
+
+    def obtener_serie_historica(self, simbolo, mercado, fecha_desde, fecha_hasta, ajustada='SinAjustar'):
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/{mercado}/Titulos/{simbolo}/Cotizacion/seriehistorica/{fecha_desde}/{fecha_hasta}/{ajustada}"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    return pd.DataFrame(data)
+                return None
+            else:
+                if response.status_code != 404:
+                    logger.warning("Error al obtener serie histórica para %s en %s: %s", simbolo, mercado, response.status_code)
+                    logger.debug('Detalle serie histórica: %s', response.text)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener serie histórica: %s', e)
+            return None
+
+    def obtener_portafolio(self, pais='argentina'):
+        """Obtiene el portafolio del usuario para un país específico"""
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/portafolio/{pais}"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            logger.info("Solicitando portafolio para %s...", pais)
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if 'activos' in data:
+                    return pd.DataFrame(data['activos'])
+                elif isinstance(data, list):
+                     return pd.DataFrame(data)
+                logger.warning("Estructura de respuesta no reconocida para portafolio.")
+                return pd.DataFrame()
+            else:
+                logger.warning('Error al obtener portafolio: %s', response.status_code)
+                logger.debug('Detalle portafolio: %s', response.text)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener portafolio: %s', e)
+            return None
+
+    def obtener_cotizacion(self, simbolo, mercado='BCBA', plazo='t0'):
+        """Obtiene la cotización actual de un título"""
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/{mercado}/Titulos/{simbolo}/Cotizacion"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener cotización: %s', e)
+            return None
+
+    def obtener_lista_clientes(self):
+        """Obtiene la lista de clientes asesorados"""
+        if not self._ensure_token():
+            return None
+        
+        url = f"{self.base_url}/api/v2/Asesores/Clientes"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.warning('Error al obtener clientes: %s', response.status_code)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener clientes: %s', e)
+            return None
+
+    def obtener_portafolio_asesor(self, id_cliente, pais='argentina'):
+        """Obtiene el portafolio de un cliente asesorado"""
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/Asesores/Portafolio/{id_cliente}/{pais}"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if 'activos' in data:
+                    return pd.DataFrame(data['activos'])
+                elif isinstance(data, list):
+                     return pd.DataFrame(data)
+                return pd.DataFrame()
+            else:
+                logger.warning('Error al obtener portafolio asesor (%s): %s', id_cliente, response.status_code)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener portafolio asesor: %s', e)
+            return None
+
+    def obtener_operaciones_asesor(self, id_cliente, estado='todas', pais='argentina', fecha_desde=None, fecha_hasta=None):
+        """Obtiene las operaciones de un cliente asesorado"""
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/Asesores/Operaciones"
+        params = {
+            'IdClienteAsesorado': id_cliente,
+            'Estado': estado,
+            'Pais': pais
+        }
+        if fecha_desde:
+            params['FechaDesde'] = fecha_desde
+        if fecha_hasta:
+            params['FechaHasta'] = fecha_hasta
+
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.warning('Error al obtener operaciones asesor (%s): %s', id_cliente, response.status_code)
+                logger.debug('Detalle operaciones asesor: %s', response.text)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener operaciones asesor: %s', e)
+            return None
+
+    def obtener_estado_cuenta_asesor(self, id_cliente):
+        """Obtiene el estado de cuenta de un cliente asesorado"""
+        if not self._ensure_token():
+            return None
+
+        url = f"{self.base_url}/api/v2/Asesores/EstadoDeCuenta/{id_cliente}"
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.warning('Error al obtener estado de cuenta asesor (%s): %s', id_cliente, response.status_code)
+                return None
+        except Exception as e:
+            logger.exception('Excepción al obtener estado de cuenta asesor: %s', e)
+            return None
+
+
+# Cliente global de IOL
+_client = None
+
+def get_client():
+    """Obtiene o crea una instancia del cliente IOL"""
+    global _client
+    if _client is None:
+        _client = IOLClient(IOL_USERNAME, IOL_PASSWORD)
+        if not _client.obtener_tokens():
+            logger.warning("Fallo al autenticar con la API de IOL")
+            _client = None
+    return _client
+
+
+def get_historical_data(symbol, market="BCBA", start_date="2020-01-01", end_date=None):
+    """
+    Obtiene datos históricos de la API de IOL y devuelve un DataFrame con columnas 'date' y 'close'
+    """
+    client = get_client()
+    if not client:
+        return pd.DataFrame()
+
+    if end_date is None:
+        import datetime
+        end_date = datetime.date.today().strftime("%Y-%m-%d")
+
+    # Manejar sufijo .BA para mercado BCBA
+    if isinstance(symbol, str) and symbol.endswith('.BA'):
+        symbol = symbol.replace('.BA', '')
+        market = 'BCBA'
+
+    logger.info("Obteniendo datos para %s en %s desde %s hasta %s...", symbol, market, start_date, end_date)
+    df = client.obtener_serie_historica(symbol, market, start_date, end_date)
+    
+    if df is None or getattr(df, 'empty', True):
+        logger.debug("No se encontraron datos para %s", symbol)
+        return pd.DataFrame()
+
+    # Renombrar y seleccionar columnas
+    if 'fechaHora' in df.columns and 'ultimoPrecio' in df.columns:
+        df['date'] = pd.to_datetime(df['fechaHora'], format='mixed')
+        df['close'] = df['ultimoPrecio']
+        return df[['date', 'close']].sort_values(by='date').reset_index(drop=True)
+    
+    return pd.DataFrame()
+
+
+# Marcar que IOL está disponible (ya que está integrado)
+IOL_DISPONIBLE = True
+
+# ============================================================================
+# CONFIGURACIÓN: Tickers base para obtener listas de sectores
+# ============================================================================
+
+# Lista de tickers del S&P 500 y otros índices principales para screening
+# Se usarán para obtener dinámicamente tickers por sector
+TICKERS_BASE_USA = [
+    # Tickers principales que cubren todos los sectores
+    'SPY',  # S&P 500 ETF (para referencia)
+    # Los sectores y tickers se obtendrán dinámicamente desde yfinance
+]
+
+# ETFs sectoriales (solo para referencia de benchmark)
 SECTORES_ETF = {
     'Technology': 'XLK',
     'Healthcare': 'XLV',
+    'Financial Services': 'XLF',
     'Financial': 'XLF',
     'Energy': 'XLE',
     'Consumer Discretionary': 'XLY',
+    'Consumer Cyclical': 'XLY',
     'Consumer Staples': 'XLP',
+    'Consumer Defensive': 'XLP',
     'Industrials': 'XLI',
     'Materials': 'XLB',
+    'Basic Materials': 'XLB',
     'Real Estate': 'XLRE',
     'Utilities': 'XLU',
     'Communication Services': 'XLC'
-}
-
-TICKERS_POR_SECTOR = {
-    'Technology': ['AAPL', 'MSFT', 'GOOGL', 'META', 'NVDA', 'AVGO', 'ORCL', 'ADBE', 'CRM', 'INTC'],
-    'Healthcare': ['UNH', 'JNJ', 'LLY', 'ABBV', 'MRK', 'TMO', 'PFE', 'ABT', 'DHR', 'BMY'],
-    'Financial': ['JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BLK', 'SCHW', 'AXP', 'USB'],
-    'Energy': ['XOM', 'CVX', 'COP', 'SLB', 'EOG', 'MPC', 'PXD', 'VLO', 'PSX', 'OXY'],
-    'Consumer Discretionary': ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX', 'TJX', 'LOW', 'BKNG', 'CMG'],
-    'Consumer Staples': ['PG', 'KO', 'PEP', 'COST', 'WMT', 'PM', 'MO', 'MDLZ', 'CL', 'KMB'],
-    'Industrials': ['BA', 'CAT', 'GE', 'UPS', 'HON', 'RTX', 'LMT', 'UNP', 'DE', 'MMM'],
-    'Materials': ['LIN', 'APD', 'ECL', 'SHW', 'DD', 'NEM', 'FCX', 'DOW', 'VMC', 'MLM'],
-    'Real Estate': ['PLD', 'AMT', 'EQIX', 'CCI', 'PSA', 'SPG', 'O', 'WELL', 'DLR', 'AVB'],
-    'Utilities': ['NEE', 'SO', 'DUK', 'D', 'AEP', 'SRE', 'EXC', 'XEL', 'ED', 'PEG'],
-    'Communication Services': ['GOOGL', 'META', 'DIS', 'NFLX', 'CMCSA', 'VZ', 'T', 'TMUS', 'CHTR', 'EA']
 }
 
 # ============================================================================
@@ -528,6 +819,108 @@ def obtener_ratios_multiples_tickers(tickers, max_workers=5):
 
 
 # ============================================================================
+# FUNCIONES PARA OBTENER TICKERS DE SECTORES DINÁMICAMENTE
+# ============================================================================
+
+def obtener_tickers_sector_dinamico(sector, industria=None, pais='United States', max_tickers=20):
+    """
+    Obtiene tickers de un sector dinámicamente desde yfinance.
+    
+    Args:
+        sector (str): Sector objetivo
+        industria (str): Industria específica (opcional)
+        pais (str): País de origen
+        max_tickers (int): Máximo de tickers a retornar
+    
+    Returns:
+        list: Lista de tickers del sector
+    """
+    try:
+        logger.info(f"Buscando tickers dinámicamente para sector: {sector} en {pais}")
+        
+        # Lista base de tickers grandes por capitalización para screening
+        # Se obtienen los componentes del S&P 500 o índices principales
+        tickers_screening = []
+        
+        # Para mercado USA: usar componentes del S&P 500
+        if pais in ['United States', 'USA']:
+            # Lista de tickers grandes del S&P 500 para screening rápido
+            # En producción, esto se podría obtener de una API o scraping
+            sp500_sample = [
+                'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK-B', 'UNH', 'XOM',
+                'JNJ', 'JPM', 'V', 'PG', 'MA', 'HD', 'CVX', 'ABBV', 'MRK', 'AVGO',
+                'LLY', 'KO', 'PEP', 'COST', 'TMO', 'BAC', 'MCD', 'CSCO', 'WMT', 'ACN',
+                'ABT', 'DHR', 'CRM', 'VZ', 'NEE', 'ADBE', 'LIN', 'ORCL', 'NKE', 'PFE',
+                'DIS', 'TXN', 'BMY', 'PM', 'RTX', 'UPS', 'T', 'MS', 'AMD', 'HON',
+                'COP', 'QCOM', 'UNP', 'LOW', 'AMGN', 'INTU', 'CAT', 'GE', 'BA', 'DE',
+                'SBUX', 'GS', 'BLK', 'AXP', 'BKNG', 'NOW', 'SPGI', 'ISRG', 'TJX', 'AMT',
+                'ADP', 'MMM', 'SYK', 'MDLZ', 'GILD', 'CVS', 'PLD', 'CI', 'REGN', 'ZTS',
+                'ADI', 'TMUS', 'MO', 'SO', 'CB', 'DUK', 'BDX', 'SLB', 'EOG', 'PXD',
+                'SCHW', 'USB', 'CME', 'MPC', 'PSX', 'VLO', 'OXY', 'CMCSA', 'NFLX', 'CHTR'
+            ]
+            tickers_screening = sp500_sample
+        
+        # Para Argentina: usar empresas locales
+        elif pais in ['Argentina', 'AR']:
+            tickers_screening = [
+                'GGAL.BA', 'BMA.BA', 'SUPV.BA', 'BBAR.BA', 'COME.BA',
+                'YPFD.BA', 'PAMP.BA', 'TGSU2.BA', 'TRAN.BA', 'CGPA2.BA',
+                'ALUA.BA', 'TXAR.BA', 'CRES.BA', 'LOMA.BA', 'MIRG.BA',
+                'EDN.BA', 'BYMA.BA', 'AGRO.BA', 'TECO2.BA', 'CEPU.BA',
+                'VALO.BA', 'BOLT.BA', 'HARG.BA', 'IRSA.BA', 'MOLI.BA'
+            ]
+        else:
+            # Para otros países, usar los mismos tickers del S&P 500
+            tickers_screening = sp500_sample[:50]
+        
+        # Screening: obtener sector de cada ticker
+        tickers_del_sector = []
+        print(f"  Screening {len(tickers_screening)} tickers para encontrar sector {sector}...")
+        
+        for ticker in tickers_screening:
+            try:
+                stock = yf.Ticker(ticker)
+                info = stock.info or {}
+                
+                ticker_sector = info.get('sector', '')
+                ticker_industria = info.get('industry', '')
+                ticker_pais = info.get('country', '')
+                
+                # Normalizar nombres de sectores
+                sector_normalizado = sector.lower().replace(' ', '')
+                ticker_sector_normalizado = ticker_sector.lower().replace(' ', '')
+                
+                # Verificar coincidencia de sector y país
+                if sector_normalizado in ticker_sector_normalizado or ticker_sector_normalizado in sector_normalizado:
+                    # Verificar país si es relevante
+                    if pais in ['Argentina', 'AR']:
+                        if ticker_pais in ['Argentina', 'AR'] or ticker.endswith('.BA'):
+                            tickers_del_sector.append(ticker)
+                            print(f"    ✓ {ticker}: {info.get('longName', ticker)[:50]}")
+                    else:
+                        # Para mercados internacionales, no filtrar estrictamente por país
+                        tickers_del_sector.append(ticker)
+                        if len(tickers_del_sector) <= 5:  # Mostrar solo primeros 5
+                            print(f"    ✓ {ticker}: {info.get('longName', ticker)[:50]}")
+                    
+                    if len(tickers_del_sector) >= max_tickers:
+                        break
+            except Exception as e:
+                continue
+        
+        if tickers_del_sector:
+            print(f"  ✓ Se encontraron {len(tickers_del_sector)} tickers del sector {sector}")
+        else:
+            logger.warning(f"No se encontraron tickers para el sector {sector}")
+        
+        return tickers_del_sector[:max_tickers]
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo tickers del sector {sector}: {e}")
+        return []
+
+
+# ============================================================================
 # FUNCIONES DE PORTAFOLIO Y COMPARACIÓN
 # ============================================================================
 
@@ -599,32 +992,29 @@ def obtener_portafolios_clientes():
 
 
 def buscar_tickers_sector_mismo_mercado(ticker_base, sector, industria, pais, max_tickers=20):
-    """Busca tickers del mismo sector y mercado"""
+    """
+    Busca tickers del mismo sector y mercado dinámicamente desde yfinance.
+    
+    Args:
+        ticker_base (str): Ticker de referencia
+        sector (str): Sector objetivo
+        industria (str): Industria específica
+        pais (str): País de origen
+        max_tickers (int): Máximo de tickers a retornar
+    
+    Returns:
+        list: Lista de tickers del mismo sector
+    """
     
     # Si es CEDEAR con subyacente extranjero
     if ticker_base.endswith('.BA') and pais not in ['Argentina', 'AR', None]:
         print(f"  {ticker_base} es CEDEAR con subyacente de {pais}")
         print(f"  Buscando empresas del mercado {pais} en sector {sector}...")
         
-        sector_mapping = {
-            'Technology': TICKERS_POR_SECTOR.get('Technology', []),
-            'Healthcare': TICKERS_POR_SECTOR.get('Healthcare', []),
-            'Financial Services': TICKERS_POR_SECTOR.get('Financial', []),
-            'Financial': TICKERS_POR_SECTOR.get('Financial', []),
-            'Energy': TICKERS_POR_SECTOR.get('Energy', []),
-            'Consumer Discretionary': TICKERS_POR_SECTOR.get('Consumer Discretionary', []),
-            'Consumer Cyclical': TICKERS_POR_SECTOR.get('Consumer Discretionary', []),
-            'Consumer Staples': TICKERS_POR_SECTOR.get('Consumer Staples', []),
-            'Consumer Defensive': TICKERS_POR_SECTOR.get('Consumer Staples', []),
-            'Industrials': TICKERS_POR_SECTOR.get('Industrials', []),
-            'Materials': TICKERS_POR_SECTOR.get('Materials', []),
-            'Basic Materials': TICKERS_POR_SECTOR.get('Materials', []),
-            'Real Estate': TICKERS_POR_SECTOR.get('Real Estate', []),
-            'Utilities': TICKERS_POR_SECTOR.get('Utilities', []),
-            'Communication Services': TICKERS_POR_SECTOR.get('Communication Services', []),
-        }
+        # Obtener tickers dinámicamente
+        tickers = obtener_tickers_sector_dinamico(sector, industria, pais, max_tickers + 5)
         
-        tickers = sector_mapping.get(sector, [])
+        # Filtrar el ticker base
         ticker_sin_ba = ticker_base.replace('.BA', '')
         tickers = [t for t in tickers if not t.endswith('.BA') and t != ticker_sin_ba]
         
@@ -635,59 +1025,26 @@ def buscar_tickers_sector_mismo_mercado(ticker_base, sector, industria, pais, ma
     
     # Si es ticker argentino REAL
     elif ticker_base.endswith('.BA') and pais in ['Argentina', 'AR']:
-        tickers_ba_reales = [
-            'GGAL.BA', 'BMA.BA', 'SUPV.BA', 'BBAR.BA', 'COME.BA',
-            'YPFD.BA', 'PAMP.BA', 'TGSU2.BA', 'TRAN.BA', 'CGPA2.BA',
-            'ALUA.BA', 'TXAR.BA', 'CRES.BA', 'LOMA.BA', 'MIRG.BA',
-            'EDN.BA', 'BYMA.BA', 'AGRO.BA', 'TECO2.BA', 'CEPU.BA',
-            'VALO.BA', 'BOLT.BA', 'HARG.BA', 'IRSA.BA', 'MOLI.BA'
-        ]
-        
-        tickers_ba = [t for t in tickers_ba_reales if t != ticker_base]
-        tickers_mismo_sector = []
-        
         print(f"  Buscando empresas argentinas del sector {sector}...")
         
-        for ticker in tickers_ba[:30]:
-            try:
-                stock = yf.Ticker(ticker)
-                info = stock.info or {}
-                ticker_sector = info.get('sector', '')
-                ticker_pais = info.get('country', '')
-                
-                if ticker_sector == sector and ticker_pais in ['Argentina', 'AR']:
-                    tickers_mismo_sector.append(ticker)
-                    print(f"    ✓ {ticker}: {info.get('longName', ticker)}")
-                    
-                    if len(tickers_mismo_sector) >= max_tickers:
-                        break
-            except:
-                continue
+        # Obtener tickers argentinos dinámicamente
+        tickers = obtener_tickers_sector_dinamico(sector, industria, 'Argentina', max_tickers + 5)
         
-        return tickers_mismo_sector
+        # Filtrar el ticker base
+        tickers = [t for t in tickers if t != ticker_base]
+        
+        return tickers[:max_tickers]
     
     else:
         # Para mercado USA directo
-        sector_mapping = {
-            'Technology': TICKERS_POR_SECTOR.get('Technology', []),
-            'Healthcare': TICKERS_POR_SECTOR.get('Healthcare', []),
-            'Financial Services': TICKERS_POR_SECTOR.get('Financial', []),
-            'Financial': TICKERS_POR_SECTOR.get('Financial', []),
-            'Energy': TICKERS_POR_SECTOR.get('Energy', []),
-            'Consumer Discretionary': TICKERS_POR_SECTOR.get('Consumer Discretionary', []),
-            'Consumer Cyclical': TICKERS_POR_SECTOR.get('Consumer Discretionary', []),
-            'Consumer Staples': TICKERS_POR_SECTOR.get('Consumer Staples', []),
-            'Consumer Defensive': TICKERS_POR_SECTOR.get('Consumer Staples', []),
-            'Industrials': TICKERS_POR_SECTOR.get('Industrials', []),
-            'Materials': TICKERS_POR_SECTOR.get('Materials', []),
-            'Basic Materials': TICKERS_POR_SECTOR.get('Materials', []),
-            'Real Estate': TICKERS_POR_SECTOR.get('Real Estate', []),
-            'Utilities': TICKERS_POR_SECTOR.get('Utilities', []),
-            'Communication Services': TICKERS_POR_SECTOR.get('Communication Services', []),
-        }
+        print(f"  Buscando empresas del mercado USA en sector {sector}...")
         
-        tickers = sector_mapping.get(sector, [])
+        # Obtener tickers dinámicamente
+        tickers = obtener_tickers_sector_dinamico(sector, industria, 'United States', max_tickers + 5)
+        
+        # Filtrar el ticker base
         tickers = [t for t in tickers if t != ticker_base and not t.endswith('.BA')]
+        
         return tickers[:max_tickers]
 
 
