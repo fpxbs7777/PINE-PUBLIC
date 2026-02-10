@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Completa - Todos los Registros Disponibles</title>
+    <style>
+        body { background: #111827; color: #fff; padding: 2rem; font-family: system-ui, sans-serif; }
+        .container { max-width: 100rem; margin: 0 auto; }
+        h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .card { background: #1f2937; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+        #status { color: #facc15; }
+        #status.text-blue { color: #60a5fa; }
+        #status.text-green { color: #4ade80; }
+        #status.text-red { color: #f87171; }
+        #results { font-family: ui-monospace, monospace; font-size: 0.75rem; max-height: 80vh; overflow-y: auto; }
+        .text-red { color: #f87171; }
+        table { width: 100%; text-align: left; border-collapse: collapse; }
+        th, td { padding: 0.3rem; border-bottom: 1px solid #374151; }
+        th { background: #374151; position: sticky; top: 0; font-weight: 600; }
+        .positive { color: #4ade80; }
+        .negative { color: #f87171; }
+        .info { background: #1e40af; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .stat-card { background: #374151; padding: 1rem; border-radius: 0.5rem; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #4ade80; }
+        .stat-label { font-size: 0.875rem; color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 API Completa - Todos los Registros Disponibles</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Info:</strong> Mostrando TODOS los registros disponibles en la API sin filtros
+        </div>
+        
+        <div class="card">
+            <h2>Estado</h2>
+            <div id="status">Probando...</div>
+        </div>
+        
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRecords">-</div>
+                <div class="stat-label">Total Registros</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="firstYear">-</div>
+                <div class="stat-label">Año Inicial</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastYear">-</div>
+                <div class="stat-label">Año Final</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="yearRange">-</div>
+                <div class="stat-label">Rango Años</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Resultados - Lista Completa de la API</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Función para mostrar TODOS los datos sin filtros
+        function processAllData(detalle) {
+            console.log('Procesando todos los datos sin filtros...');
+            
+            // Ordenar por fecha descendente (más reciente primero)
+            return detalle
+                .map(item => ({
+                    fecha: item.fecha,
+                    valor: item.valor,
+                    year: new Date(item.fecha).getFullYear()
+                }))
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        }
+
+        // Calcular estadísticas
+        function calculateStats(data) {
+            if (data.length === 0) return {};
+            
+            const years = data.map(item => item.year);
+            const firstYear = Math.min(...years);
+            const lastYear = Math.max(...years);
+            
+            return {
+                total: data.length,
+                firstYear: firstYear,
+                lastYear: lastYear,
+                yearRange: lastYear - firstYear + 1
+            };
+        }
+
+        async function testAPICompleta() {
+            const statusEl = document.getElementById('status');
+            const resultsEl = document.getElementById('results');
+            const statsEl = document.getElementById('stats');
+            
+            try {
+                statusEl.textContent = 'Obteniendo TODOS los datos de la API...';
+                statusEl.className = 'text-blue';
+                
+                // Usar la API oficial del BCRA
+                const url = 'https://api.bcra.gob.ar/estadisticas/v4.0/Monetarias/28';
+                console.log('Obteniendo datos completos de:', url);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Estructura completa de la API:', data);
+                
+                if (data && data.results && data.results.length > 0) {
+                    const result = data.results[0];
+                    if (result.detalle && result.detalle.length > 0) {
+                        const allData = processAllData(result.detalle);
+                        const stats = calculateStats(allData);
+                        
+                        // Actualizar estadísticas
+                        document.getElementById('totalRecords').textContent = stats.total;
+                        document.getElementById('firstYear').textContent = stats.firstYear;
+                        document.getElementById('lastYear').textContent = stats.lastYear;
+                        document.getElementById('yearRange').textContent = stats.yearRange + ' años';
+                        
+                        statusEl.textContent = `✅ API Completa - ${stats.total} registros encontrados`;
+                        statusEl.className = 'text-green';
+                        
+                        console.log('Estadísticas:', stats);
+                        console.log('Primeros 5 registros:', allData.slice(0, 5));
+                        console.log('Últimos 5 registros:', allData.slice(-5));
+                        
+                        let html = `<table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b">
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Año</th>
+                                    <th>Inflación %</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                        
+                        allData.forEach((item, index) => {
+                            const inflacion = item.valor !== null && item.valor !== undefined ? item.valor.toFixed(1) + '%' : 'N/D';
+                            const valueClass = item.valor > 0 ? 'positive' : item.valor < 0 ? 'negative' : '';
+                            const isFuture = new Date(item.fecha) > new Date();
+                            
+                            html += `<tr class="border-b ${isFuture ? 'text-yellow' : ''}">
+                                <td>${index + 1}</td>
+                                <td>${item.fecha}</td>
+                                <td>${item.year}</td>
+                                <td class="${valueClass}">${inflacion}</td>
+                            </tr>`;
+                        });
+                        
+                        html += '</tbody></table>';
+                        resultsEl.innerHTML = html;
+                        
+                        console.log('✅ API completa cargada:', stats.total, 'registros');
+                        
+                    } else {
+                        throw new Error('No se encontraron datos en el detalle');
+                    }
+                } else {
+                    throw new Error('No se encontraron resultados en la API');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                statusEl.textContent = '❌ Error: ' + error.message;
+                statusEl.className = 'text-red';
+                resultsEl.innerHTML = `<div class="text-red">Error: ${error.message}</div>`;
+            }
+        }
+        
+        testAPICompleta();
+    </script>
+</body>
+</html>
