@@ -1,5 +1,10 @@
+/**
+ * CONFIGURACIÓN DE CREDENCIALES IOL
+ */
 var USUARIO_IOL = 'xxx@gmail.com';
 var PASS_IOL = 'xxxx'; 
+
+// --- SECCIÓN: INVERTIRONLINE (IOL) ---
 
 /**
  * Obtiene el token de acceso para la API de InvertirOnline.
@@ -13,7 +18,10 @@ function getIOLToken() {
 }
 
 /**
- * FUNCIÓN DINÁMICA IOL: Trae datos reales de InvertirOnline[cite: 1, 3].
+ * Obtiene datos en tiempo real de IOL (Merval, Bonos, Cedears en BYMA).
+ * @param {string} mercado Mercado (ej: "BCBA", "NYSE", "NASDAQ").
+ * @param {string} simbolo Ticker (ej: "AL30", "GGAL").
+ * @param {string} dato Campo a obtener (ultimo, var, ytm, apertura, etc).
  * @customfunction
  */
 function getDatoIOL(mercado, simbolo, dato) {
@@ -28,11 +36,9 @@ function getDatoIOL(mercado, simbolo, dato) {
 
     var ultimo = res.ultimoPrecio;
     var cierreAnt = res.cierreAnterior;
-    var apertura = res.precioApertura;
-    var maximo = res.maximo;
-    var minimo = res.minimo;
-
-    if (apertura === 0 || maximo === 0) {
+    
+    // Si el mercado está cerrado o no hay trade, buscamos en histórica reciente
+    if (res.precioApertura === 0 || res.maximo === 0) {
        var hoy = new Date();
        var hace5dias = new Date(hoy.getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
        var hoyStr = hoy.toISOString().split('T')[0];
@@ -41,9 +47,6 @@ function getDatoIOL(mercado, simbolo, dato) {
        
        if (resHist && resHist.length > 0) {
          var h = resHist[resHist.length - 1];
-         apertura = h.apertura;
-         maximo = h.maximo;
-         minimo = h.minimo;
          if (ultimo === 0) ultimo = h.ultimoPrecio;
        }
     }
@@ -51,64 +54,78 @@ function getDatoIOL(mercado, simbolo, dato) {
     switch(dato.toLowerCase()) {
       case "ultimo": return ultimo > 0 ? ultimo : cierreAnt;
       case "var": return (cierreAnt > 0) ? (ultimo / cierreAnt) - 1 : 0;
-      case "ytm": 
-        var tir = res.tir || res.yield || 0;
-        return tir !== 0 ? (tir / 100) : "N/A";
-      case "apertura": return apertura;
-      case "cierre_anterior": return cierreAnt;
-      case "minimo": return minimo;
-      case "maximo": return maximo;
+      case "ytm": return (res.tir || res.yield || 0) / 100;
+      case "apertura": return res.precioApertura || 0;
+      case "maximo": return res.maximo || 0;
+      case "minimo": return res.minimo || 0;
       case "volumen": return res.volumenNominal || 0;
-      case "isin": return res.isin || "N/A";
       case "descripcion": return res.descripcion || "N/A";
-      case "fecha": return res.fechaHora ? res.fechaHora.split("T")[0] : "";
       default: return ultimo;
     }
   } catch(e) { return "Error IOL"; }
 }
 
+// --- SECCIÓN: YAHOO FINANCE (YF) ---
+
 /**
- * FUNCIÓN YFINANCE: Emula las funciones del Ticker de yfinance[cite: 3, 6, 15].
- * Soporta parámetros como: 'info', 'history', 'calendar', 'actions', 'dividends', 'splits'.
- * @param {string} ticker El símbolo (ej. "AAPL", "MSFT").
- * @param {string} tipo El atributo de yfinance a consultar.
+ * Obtiene el precio actual o info básica de Yahoo Finance.
+ * @param {string} ticker Ticker (ej: "AAPL", "GGAL", "BTC-USD").
+ * @param {string} tipo Opcional: "price" (defecto), "name", "currency", "exchange".
  * @customfunction
  */
-function getDatoYFinance(ticker, tipo) {
-  if (!ticker) return "";
-  // Yahoo Finance Query2 API para emular el módulo Ticker [cite: 3, 6]
-  var url = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker + "?interval=1d&range=5d";
+function getDatoYF(ticker, tipo) {
+  if (!ticker) return "Falta Ticker";
+  tipo = tipo || "price";
+  ticker = ticker.toString().trim().toUpperCase();
   
   try {
-    var response = UrlFetchApp.fetch(url, {'muteHttpExceptions': true});
-    var data = JSON.parse(response.getContentText());
-    var meta = data.chart.result[0].meta;
-    var indicators = data.chart.result[0].indicators.quote[0];
-
+    var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker;
+    var res = UrlFetchApp.fetch(url, { "headers": { "User-Agent": "Mozilla/5.0" } });
+    var json = JSON.parse(res.getContentText());
+    var meta = json.chart.result[0].meta;
+    
     switch(tipo.toLowerCase()) {
-      case "info": // Emula dat.info 
-        return "Precio: " + meta.regularMarketPrice + " / Currency: " + meta.currency;
-      
-      case "history": // Emula dat.history() [cite: 3, 14, 15]
-        return meta.regularMarketPrice; 
-        
-      case "calendar": // Emula dat.calendar [cite: 6, 13]
-        return "Symbol: " + meta.symbol + " / Exchange: " + meta.exchangeName;
-
-      case "actions": // Emula dat.actions 
-      case "dividends": // Emula dat.get_dividends() [cite: 14, 15]
-        return meta.chartPreviousClose || "N/A";
-
-      case "splits": // Emula dat.get_splits() [cite: 14, 15]
-        return "Data Not Available in Lite Mode";
-
-      case "isin": // Emula dat.isin [cite: 6, 12]
-        return meta.fullExchangeName || "N/A";
-
-      default:
-        return meta.regularMarketPrice || "N/A";
+      case "price": return meta.regularMarketPrice;
+      case "name": return meta.symbol;
+      case "currency": return meta.currency;
+      case "exchange": return meta.exchangeName;
+      default: return meta.regularMarketPrice;
     }
+  } catch(e) { return "Error YF"; }
+}
+
+/**
+ * Obtiene la SERIE HISTÓRICA de precios de Yahoo Finance.
+ * Devuelve una tabla con Fecha y Precio de Cierre.
+ * @param {string} ticker Ticker (ej: "AAPL").
+ * @param {string} intervalo "1d", "1wk", "1mo".
+ * @param {string} rango "1mo", "3mo", "1y", "5y", "max".
+ * @customfunction
+ */
+function getHistoryYF(ticker, intervalo, rango) {
+  if (!ticker) return "Falta Ticker";
+  intervalo = intervalo || "1d";
+  rango = rango || "1mo";
+  
+  try {
+    var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker + "?interval=" + intervalo + "&range=" + rango;
+    var res = UrlFetchApp.fetch(url, { "headers": { "User-Agent": "Mozilla/5.0" } });
+    var json = JSON.parse(res.getContentText());
+    
+    var timestamps = json.chart.result[0].timestamp;
+    var quotes = json.chart.result[0].indicators.adjclose[0].adjclose; // Usamos precio ajustado
+    
+    var result = [["Fecha", "Cierre Ajustado"]];
+    
+    for (var i = 0; i < timestamps.length; i++) {
+      var date = new Date(timestamps[i] * 1000);
+      // Formateamos la fecha a YYYY-MM-DD
+      var dateStr = date.toISOString().split('T')[0];
+      result.push([dateStr, quotes[i]]);
+    }
+    
+    return result;
   } catch(e) {
-    return "Error YF";
+    return "Error en serie histórica";
   }
 }
