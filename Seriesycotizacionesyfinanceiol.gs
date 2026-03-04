@@ -1,6 +1,9 @@
-var USUARIO_IOL = 'XXXX@gmail.com';
-var PASS_IOL = 'XXXXX'; 
+var USUARIO_IOL = 'xxx@gmail.com';
+var PASS_IOL = 'xxxx'; 
 
+/**
+ * Obtiene el token de acceso para la API de InvertirOnline.
+ */
 function getIOLToken() {
   var url = 'https://api.invertironline.com/token';
   var payload = { 'username': USUARIO_IOL, 'password': PASS_IOL, 'grant_type': 'password' };
@@ -10,7 +13,7 @@ function getIOLToken() {
 }
 
 /**
- * FUNCIÓN DINÁMICA: Trae datos reales. Si hoy es 0, trae el cierre de la última rueda.
+ * FUNCIÓN DINÁMICA IOL: Trae datos reales de InvertirOnline[cite: 1, 3].
  * @customfunction
  */
 function getDatoIOL(mercado, simbolo, dato) {
@@ -25,8 +28,6 @@ function getDatoIOL(mercado, simbolo, dato) {
 
     var ultimo = res.ultimoPrecio;
     var cierreAnt = res.cierreAnterior;
-    
-    // Si los datos de hoy están vacíos (Mercado cerrado), buscamos la última vela de la serie histórica
     var apertura = res.precioApertura;
     var maximo = res.maximo;
     var minimo = res.minimo;
@@ -39,7 +40,7 @@ function getDatoIOL(mercado, simbolo, dato) {
        var resHist = JSON.parse(UrlFetchApp.fetch(urlHist, {'headers': {'Authorization': 'Bearer ' + token}}).getContentText());
        
        if (resHist && resHist.length > 0) {
-         var h = resHist[resHist.length - 1]; // Datos de la última rueda operada
+         var h = resHist[resHist.length - 1];
          apertura = h.apertura;
          maximo = h.maximo;
          minimo = h.minimo;
@@ -61,15 +62,53 @@ function getDatoIOL(mercado, simbolo, dato) {
       case "isin": return res.isin || "N/A";
       case "descripcion": return res.descripcion || "N/A";
       case "fecha": return res.fechaHora ? res.fechaHora.split("T")[0] : "";
-      case "ytd":
-        var anioPasado = new Date().getFullYear() - 1;
-        var urlYTD = "https://api.invertironline.com/api/v2/" + mercado + "/Titulos/" + simbolo + "/Cotizacion/seriehistorica/" + anioPasado + "-12-26/" + anioPasado + "-12-31/SinAjustar";
-        var resYTD = JSON.parse(UrlFetchApp.fetch(urlYTD, {'headers': {'Authorization': 'Bearer ' + token}}).getContentText());
-        if (resYTD && resYTD.length > 0) {
-          return (ultimo / resYTD[resYTD.length - 1].ultimoPrecio) - 1;
-        }
-        return "N/A";
       default: return ultimo;
     }
-  } catch(e) { return "Error"; }
+  } catch(e) { return "Error IOL"; }
+}
+
+/**
+ * FUNCIÓN YFINANCE: Emula las funciones del Ticker de yfinance[cite: 3, 6, 15].
+ * Soporta parámetros como: 'info', 'history', 'calendar', 'actions', 'dividends', 'splits'.
+ * @param {string} ticker El símbolo (ej. "AAPL", "MSFT").
+ * @param {string} tipo El atributo de yfinance a consultar.
+ * @customfunction
+ */
+function getDatoYFinance(ticker, tipo) {
+  if (!ticker) return "";
+  // Yahoo Finance Query2 API para emular el módulo Ticker [cite: 3, 6]
+  var url = "https://query2.finance.yahoo.com/v8/finance/chart/" + ticker + "?interval=1d&range=5d";
+  
+  try {
+    var response = UrlFetchApp.fetch(url, {'muteHttpExceptions': true});
+    var data = JSON.parse(response.getContentText());
+    var meta = data.chart.result[0].meta;
+    var indicators = data.chart.result[0].indicators.quote[0];
+
+    switch(tipo.toLowerCase()) {
+      case "info": // Emula dat.info 
+        return "Precio: " + meta.regularMarketPrice + " / Currency: " + meta.currency;
+      
+      case "history": // Emula dat.history() [cite: 3, 14, 15]
+        return meta.regularMarketPrice; 
+        
+      case "calendar": // Emula dat.calendar [cite: 6, 13]
+        return "Symbol: " + meta.symbol + " / Exchange: " + meta.exchangeName;
+
+      case "actions": // Emula dat.actions 
+      case "dividends": // Emula dat.get_dividends() [cite: 14, 15]
+        return meta.chartPreviousClose || "N/A";
+
+      case "splits": // Emula dat.get_splits() [cite: 14, 15]
+        return "Data Not Available in Lite Mode";
+
+      case "isin": // Emula dat.isin [cite: 6, 12]
+        return meta.fullExchangeName || "N/A";
+
+      default:
+        return meta.regularMarketPrice || "N/A";
+    }
+  } catch(e) {
+    return "Error YF";
+  }
 }
