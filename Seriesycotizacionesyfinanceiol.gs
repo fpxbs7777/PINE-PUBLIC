@@ -17,100 +17,109 @@ function getIOLToken() {
 }
 
 /**
- * OBTIENE EL DATO DE UNA FECHA ESPECÍFICA (MEP Histórico)
- * Si la fecha es feriado, busca hasta 5 días atrás automáticamente.
- */
-function getDatoIOLHistorico(mercado, simbolo, dato, fecha) {
-  if (!simbolo || !mercado) return "Faltan parámetros";
-  if (!fecha || fecha === "") return getDatoIOL(mercado, simbolo, dato);
-
-  var token = getIOLToken();
-  var fechaFinStr;
-  var fechaInicioStr;
-
-  try {
-    var d = new Date(fecha);
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    fechaFinStr = Utilities.formatDate(d, "GMT", "yyyy-MM-dd");
-    
-    // Rango de 5 días atrás por si la fecha elegida fue feriado/finde
-    var dInicio = new Date(d);
-    dInicio.setDate(d.getDate() - 5);
-    fechaInicioStr = Utilities.formatDate(dInicio, "GMT", "yyyy-MM-dd");
-  } catch(e) { return "Fecha Inválida"; }
-
-  var url = "https://api.invertironline.com/api/v2/" + mercado + "/Titulos/" + simbolo + "/Cotizacion/seriehistorica/" + fechaInicioStr + "/" + fechaFinStr + "/SinAjustar";
-  
-  try {
-    var response = UrlFetchApp.fetch(url, {'headers': {'Authorization': 'Bearer ' + token}, 'muteHttpExceptions': true});
-    var data = JSON.parse(response.getContentText());
-    if (data && data.length > 0) {
-      var registro = data[data.length - 1]; // El más cercano a la fecha pedida
-      switch(dato.toLowerCase().trim()) {
-        case "ultimo": return registro.ultimoPrecio;
-        case "apertura": return registro.apertura;
-        case "maximo": return registro.maximo;
-        case "minimo": return registro.minimo;
-        case "volumen": return registro.volumenNominal;
-        default: return registro.ultimoPrecio;
-      }
-    }
-    return "Sin datos";
-  } catch(e) { return "Error API"; }
-}
-
-/**
- * OBTIENE DATOS ACTUALES DE IOL
- * Soporta refresco automático mediante el 4to parámetro.
+ * Obtiene datos actuales de IOL.
+ * @customfunction
  */
 function getDatoIOL(mercado, simbolo, dato, refresco) {
   if (!simbolo) return "";
   var token = getIOLToken();
   var url = "https://api.invertironline.com/api/v2/" + mercado + "/Titulos/" + simbolo + "/Cotizacion";
-  
   try {
     var response = UrlFetchApp.fetch(url, {'headers': {'Authorization': 'Bearer ' + token}, 'muteHttpExceptions': true});
     var res = JSON.parse(response.getContentText());
     if (!res || res.ultimoPrecio === undefined) return "N/A";
-
-    var ultimo = res.ultimoPrecio;
-    var cierreAnt = res.cierreAnterior;
-
-    // Si el mercado está cerrado (precio 0), intenta rescatar del histórico reciente
-    if (ultimo === 0) {
-       return getDatoIOLHistorico(mercado, simbolo, dato, new Date());
-    }
-
+    if (res.ultimoPrecio === 0) return getDatoIOLHistorico(mercado, simbolo, dato, new Date());
     switch(dato.toLowerCase().trim()) {
-      case "ultimo": return ultimo;
-      case "var": return (cierreAnt > 0) ? (ultimo / cierreAnt) - 1 : 0;
-      case "apertura": return res.precioApertura;
-      case "minimo": return res.minimo;
-      case "maximo": return res.maximo;
+      case "ultimo": return res.ultimoPrecio;
+      case "var": return (res.cierreAnterior > 0) ? (res.ultimoPrecio / res.cierreAnterior) - 1 : 0;
       case "volumen": return res.volumenNominal || 0;
-      case "ytm": return res.tir ? (res.tir / 100) : "N/A";
-      default: return ultimo;
+      default: return res.ultimoPrecio;
     }
   } catch(e) { return "Error IOL"; }
+}
+
+/**
+ * Obtiene el precio de IOL en una fecha específica (Para MEP).
+ * @customfunction
+ */
+function getDatoIOLHistorico(mercado, simbolo, dato, fecha) {
+  if (!simbolo || !fecha) return "";
+  var token = getIOLToken();
+  var d = new Date(fecha);
+  d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+  var fFin = Utilities.formatDate(d, "GMT", "yyyy-MM-dd");
+  var dIni = new Date(d); dIni.setDate(d.getDate() - 7);
+  var fIni = Utilities.formatDate(dIni, "GMT", "yyyy-MM-dd");
+  var url = "https://api.invertironline.com/api/v2/" + mercado + "/Titulos/" + simbolo + "/Cotizacion/seriehistorica/" + fIni + "/" + fFin + "/SinAjustar";
+  try {
+    var res = JSON.parse(UrlFetchApp.fetch(url, {'headers': {'Authorization': 'Bearer ' + token}}).getContentText());
+    if (res && res.length > 0) {
+      var h = res[res.length - 1];
+      return (dato.toLowerCase() === "volumen") ? h.volumenNominal : h.ultimoPrecio;
+    }
+    return "N/A";
+  } catch(e) { return "Error Hist."; }
+}
+
+/**
+ * Obtiene una TABLA completa de IOL.
+ * @customfunction
+ */
+function getHistoryIOL(mercado, simbolo, desde, hasta) {
+  var token = getIOLToken();
+  var f1 = (desde instanceof Date) ? Utilities.formatDate(desde, "GMT", "yyyy-MM-dd") : desde;
+  var f2 = (hasta instanceof Date) ? Utilities.formatDate(hasta, "GMT", "yyyy-MM-dd") : hasta;
+  var url = "https://api.invertironline.com/api/v2/" + mercado + "/Titulos/" + simbolo + "/Cotizacion/seriehistorica/" + f1 + "/" + f2 + "/SinAjustar";
+  try {
+    var data = JSON.parse(UrlFetchApp.fetch(url, {'headers': {'Authorization': 'Bearer ' + token}}).getContentText());
+    var res = [["Fecha", "Cierre", "Volumen"]];
+    for (var i=0; i<data.length; i++) res.push([data[i].fechaHora.split("T")[0], data[i].ultimoPrecio, data[i].volumenNominal]);
+    return res;
+  } catch(e) { return "Error Tabla IOL"; }
 }
 
 // ==========================================
 //   SECCIÓN 2: YAHOO FINANCE (YF)
 // ==========================================
 
+/**
+ * Obtiene datos actuales de Yahoo Finance.
+ * @customfunction
+ */
 function getDatoYF(ticker, dato, refresco) {
   if (!ticker) return "";
   try {
-    var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker;
-    var res = UrlFetchApp.fetch(url, { "headers": { "User-Agent": "Mozilla/5.0" } });
+    var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker.toString().trim().toUpperCase();
+    var res = UrlFetchApp.fetch(url, { "headers": { "User-Agent": "Mozilla/5.0" }, "muteHttpExceptions": true });
     var json = JSON.parse(res.getContentText());
+    if (!json.chart || !json.chart.result) return "N/A";
     var meta = json.chart.result[0].meta;
-    switch((dato || "price").toLowerCase()) {
-      case "price": return meta.regularMarketPrice;
+    switch((dato || "ultimo").toLowerCase().trim()) {
+      case "ultimo": return meta.regularMarketPrice;
+      case "name": return meta.symbol;
       case "currency": return meta.currency;
       default: return meta.regularMarketPrice;
     }
   } catch(e) { return "Error YF"; }
+}
+
+/**
+ * Obtiene el historial de Yahoo Finance en una tabla.
+ * @customfunction
+ */
+function getHistoryYF(ticker, desde, hasta) {
+  var p1 = Math.floor(new Date(desde).getTime() / 1000);
+  var p2 = Math.floor(new Date(hasta).getTime() / 1000);
+  try {
+    var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker + "?period1=" + p1 + "&period2=" + p2 + "&interval=1d";
+    var res = UrlFetchApp.fetch(url, { "headers": { "User-Agent": "Mozilla/5.0" } });
+    var json = JSON.parse(res.getContentText());
+    var t = json.chart.result[0].timestamp;
+    var c = json.chart.result[0].indicators.adjclose[0].adjclose;
+    var resTab = [["Fecha", "Cierre Adj"]];
+    for (var i=0; i<t.length; i++) resTab.push([Utilities.formatDate(new Date(t[i]*1000), "GMT", "yyyy-MM-dd"), c[i]]);
+    return resTab;
+  } catch(e) { return "Error Tabla YF"; }
 }
 
 // ==========================================
@@ -119,8 +128,6 @@ function getDatoYF(ticker, dato, refresco) {
 
 function refrescarDatosAutomatico() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Panel"); // <--- Asegurate que tu pestaña se llame Panel
-  if (sheet) {
-    sheet.getRange("Z1").setValue(new Date().getTime());
-  }
+  var sheet = ss.getSheetByName("Panel"); 
+  if (sheet) sheet.getRange("Z1").setValue(new Date().getTime());
 }
