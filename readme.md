@@ -189,3 +189,7 @@ Recargá la página de Google Sheets. Si sigue sin aparecer, verificá que el sc
 ## Créditos
 
 Desarrollado para uso personal con la API de [Balanz](https://balanz.com). No es un producto oficial de Balanz.
+
+
+<img width="853" height="293" alt="image" src="https://github.com/user-attachments/assets/a0817804-382c-4e6f-82ca-9626aff31262" />
+
