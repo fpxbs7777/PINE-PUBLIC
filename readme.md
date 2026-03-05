@@ -190,7 +190,5 @@ Recargá la página de Google Sheets. Si sigue sin aparecer, verificá que el sc
 
 Desarrollado para uso personal con la API de [Balanz](https://balanz.com). No es un producto oficial de Balanz.
 
-
-<img width="853" height="293" alt="image" src="https://github.com/user-attachments/assets/a0817804-382c-4e6f-82ca-9626aff31262" />
-<img width="521" height="24" alt="image" src="https://github.com/user-attachments/assets/7b4d9124-fd0c-40a3-bb25-ec1b6018a6cf" />
+<img width="1238" height="372" alt="image" src="https://github.com/user-attachments/assets/9c42ed2a-618f-4a28-95f6-35f7950cd121" />
 
