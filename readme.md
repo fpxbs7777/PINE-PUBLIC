@@ -192,4 +192,5 @@ Desarrollado para uso personal con la API de [Balanz](https://balanz.com). No es
 
 
 <img width="853" height="293" alt="image" src="https://github.com/user-attachments/assets/a0817804-382c-4e6f-82ca-9626aff31262" />
+<img width="521" height="24" alt="image" src="https://github.com/user-attachments/assets/7b4d9124-fd0c-40a3-bb25-ec1b6018a6cf" />
 
