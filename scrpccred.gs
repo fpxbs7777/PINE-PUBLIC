@@ -31,7 +31,7 @@
 
 const ID_CUENTA = "96552";
 const BALANZ_USER = "cboos";
-const BALANZ_PASS = "Olivia12102016_";
+const BALANZ_PASS = "_";
 const ID_DISPOSITIVO = "5b8a6cdc-f775-4e85-9ded-7fb213a52ac9";
 
 // ─── MENÚ ────────────────────────────────────────────────────────────────────
