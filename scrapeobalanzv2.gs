@@ -1,61 +1,103 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║              BALANZ — Funciones personalizadas Google Sheets v7              ║
+ * ║              BALANZ — Funciones personalizadas Google Sheets v9              ║
  * ╠══════════════════════════════════════════════════════════════════════════════╣
  * ║                                                                              ║
- * ║  ── BONOS ──────────────────────────────────────────────────────────────     ║
- * ║  =BALANZ_PRECIO(ticker)                   Precio limpio                      ║
- * ║  =BALANZ_TIR(ticker)                      TIR / YTM                          ║
- * ║  =BALANZ_TNA(ticker)                      Tasa nominal anual                 ║
- * ║  =BALANZ_PARIDAD(ticker)                  Paridad                            ║
- * ║  =BALANZ_DURATION(ticker)                 Duration modificada                ║
- * ║  =BALANZ_CONVEXITY(ticker)                Convexity                          ║
- * ║  =BALANZ_CY(ticker)                       Current Yield                      ║
- * ║  =BALANZ_NOMBRE(ticker)                   Nombre del instrumento             ║
+ * ║  ── BONOS / RENTA FIJA ─────────────────────────────────────────────────    ║
+ * ║  =BALANZ_PRECIO(ticker)             Precio limpio                            ║
+ * ║  =BALANZ_TIR(ticker)                TIR / YTM                                ║
+ * ║  =BALANZ_TNA(ticker)                Tasa nominal anual                       ║
+ * ║  =BALANZ_PARIDAD(ticker)            Paridad                                  ║
+ * ║  =BALANZ_DURATION(ticker)           Duration modificada                      ║
+ * ║  =BALANZ_MACAULAY(ticker)           Duration de Macaulay                     ║
+ * ║  =BALANZ_CONVEXITY(ticker)          Convexity                                ║
+ * ║  =BALANZ_CY(ticker)                 Current Yield                            ║
+ * ║  =BALANZ_NOMBRE(ticker)             Nombre del instrumento                   ║
+ * ║  =BALANZ_VENCIMIENTO(ticker)        Fecha de vencimiento                     ║
+ * ║  =BALANZ_EMISION(ticker)            Fecha de emisión                         ║
+ * ║  =BALANZ_PROXIMO_PAGO(ticker)       Fecha próximo pago                       ║
+ * ║  =BALANZ_PROXIMO_PAGO_INFO(ticker)  Descripción próximo pago                 ║
+ * ║  =BALANZ_DIAS_PAGO(ticker)          Días hasta próximo pago                  ║
+ * ║  =BALANZ_CUPON(ticker)              Tasa de cupón                            ║
+ * ║  =BALANZ_TIPO_CUPON(ticker)         Tipo de cupón                            ║
+ * ║  =BALANZ_FRECUENCIA(ticker)         Frecuencia de pagos                      ║
+ * ║  =BALANZ_RESIDUAL(ticker)           Valor residual                           ║
+ * ║  =BALANZ_VALOR_TECNICO(ticker)      Valor técnico                            ║
+ * ║  =BALANZ_INTERES_DEV(ticker)        Interés devengado                        ║
+ * ║  =BALANZ_MONEDA(ticker)             Moneda del bono                          ║
+ * ║  =BALANZ_JURISDICCION(ticker)       Jurisdicción (ARG / NY)                  ║
+ * ║  =BALANZ_ISIN(ticker)               Código ISIN                              ║
  * ║                                                                              ║
  * ║  ── CUALQUIER INSTRUMENTO ──────────────────────────────────────────────     ║
- * ║  =BALANZ_ULTIMO(ticker)                   Último precio                      ║
- * ║  =BALANZ_VARIACION(ticker)                Variación % del día                ║
- * ║  =BALANZ_VOLUMEN(ticker)                  Volumen operado                    ║
- * ║  =BALANZ_APERTURA(ticker)                 Precio apertura                    ║
- * ║  =BALANZ_MAXIMO(ticker)                   Máximo del día                     ║
- * ║  =BALANZ_MINIMO(ticker)                   Mínimo del día                     ║
- * ║  =BALANZ_CIERRE(ticker)                   Cierre anterior                    ║
- * ║  =BALANZ_VWAP(ticker)                     VWAP del día                       ║
- * ║  =BALANZ(ticker, campo)                   Campo libre de cualquier ticker    ║
- * ║  =BALANZ_FILA(ticker)                     Fila completa de datos             ║
- * ║  =BALANZ_HEADER()                         Cabecera para BALANZ_FILA          ║
+ * ║  =BALANZ_ULTIMO(ticker)             Último precio                            ║
+ * ║  =BALANZ_VARIACION(ticker)          Variación % del día                      ║
+ * ║  =BALANZ_VOLUMEN(ticker)            Volumen operado                          ║
+ * ║  =BALANZ_APERTURA(ticker)           Precio apertura                          ║
+ * ║  =BALANZ_MAXIMO(ticker)             Máximo del día                           ║
+ * ║  =BALANZ_MINIMO(ticker)             Mínimo del día                           ║
+ * ║  =BALANZ_CIERRE(ticker)             Cierre anterior                          ║
+ * ║  =BALANZ_VWAP(ticker)               VWAP del día                             ║
+ * ║  =BALANZ(ticker, campo)             Campo libre — ver lista completa abajo   ║
+ * ║  =BALANZ_FILA(ticker)               Fila completa de datos                   ║
+ * ║  =BALANZ_HEADER()                   Cabecera para BALANZ_FILA                ║
  * ║                                                                              ║
- * ║  ── HISTÓRICO DE PRECIOS (OHLCV) ───────────────────────────────────────     ║
- * ║  =BALANZ_HIST(ticker, desde, hasta, campo)  Histórico campo libre            ║
- * ║  =BALANZ_HIST_PRECIO(ticker, desde, hasta)  Precios de cierre                ║
- * ║  =BALANZ_HIST_MAXIMO(ticker, desde, hasta)  Máximos históricos               ║
- * ║  =BALANZ_HIST_MINIMO(ticker, desde, hasta)  Mínimos históricos               ║
- * ║  =BALANZ_HIST_VOLUMEN(ticker, desde, hasta) Volumen histórico                ║
- * ║  =BALANZ_HIST_OHLCV(ticker, desde, hasta)   Tabla completa OHLCV             ║
+ * ║  Campos válidos para =BALANZ(ticker, campo):                                 ║
+ * ║  precio · tir · ytm · tna · paridad · duration · macaulay · convexity       ║
+ * ║  cy · currentyield · descripcion · nombre · ultimo · variacion · volumen    ║
+ * ║  apertura · maximo · minimo · cierre · vwap · vencimiento · emision         ║
+ * ║  proximopago · proximopagoinfo · diaspago · cupon · tipocupon · frecuencia  ║
+ * ║  residual · valortecnico · interesdev · moneda · jurisdiccion · isin        ║
  * ║                                                                              ║
- * ║  ── EVOLUCIÓN DE CARTERA (histórico de portafolio) ─────────────────────     ║
- * ║  =BALANZ_EVOL(desde, hasta)               Evolución histórica de cartera     ║
- * ║  =BALANZ_EVOL_HEADER()                    Cabecera para BALANZ_EVOL          ║
+ * ║  ── HISTÓRICO DE PRECIOS (OHLCV) ───────────────────────────────────────    ║
+ * ║  =BALANZ_HIST(ticker, desde, hasta, campo)                                   ║
+ * ║  =BALANZ_HIST_PRECIO(ticker, desde, hasta)                                   ║
+ * ║  =BALANZ_HIST_MAXIMO(ticker, desde, hasta)                                   ║
+ * ║  =BALANZ_HIST_MINIMO(ticker, desde, hasta)                                   ║
+ * ║  =BALANZ_HIST_VOLUMEN(ticker, desde, hasta)                                  ║
+ * ║  =BALANZ_HIST_OHLCV(ticker, desde, hasta)                                    ║
+ * ║                                                                              ║
+ * ║  ── EVOLUCIÓN DE CARTERA ────────────────────────────────────────────────    ║
+ * ║  =BALANZ_EVOL(desde, hasta)                                                  ║
+ * ║  =BALANZ_EVOL_HEADER()                                                       ║
  * ║                                                                              ║
  * ║  ── ESTADO ACTUAL DE CUENTA ────────────────────────────────────────────     ║
- * ║  =BALANZ_SALDO()                          Saldo disponible en pesos (CI)     ║
- * ║  =BALANZ_SALDO_24()                       Saldo disponible pesos 24hs        ║
- * ║  =BALANZ_SALDO_USD()                      Saldo disponible USD (CI)          ║
- * ║  =BALANZ_SALDO_USD_24()                   Saldo disponible USD 24hs          ║
- * ║  =BALANZ_MEP()                            Dólar MEP actual                   ║
- * ║  =BALANZ_CCL()                            Dólar CCL actual                   ║
- * ║  =BALANZ_TENENCIA_TOTAL()                 Tenencia total en pesos             ║
- * ║  =BALANZ_PORTAFOLIO_HEADER()              Cabecera de posiciones              ║
- * ║  =BALANZ_PORTAFOLIO()                     Posiciones actuales                 ║
+ * ║  =BALANZ_SALDO()                    Saldo disponible en pesos (CI)           ║
+ * ║  =BALANZ_SALDO_24()                 Saldo disponible pesos 24hs              ║
+ * ║  =BALANZ_SALDO_USD()                Saldo disponible USD (CI)                ║
+ * ║  =BALANZ_SALDO_USD_24()             Saldo disponible USD 24hs                ║
+ * ║  =BALANZ_MEP()                      Dólar MEP actual                         ║
+ * ║  =BALANZ_CCL()                      Dólar CCL actual                         ║
+ * ║  =BALANZ_TENENCIA_TOTAL()           Tenencia total en pesos                  ║
+ * ║  =BALANZ_PORTAFOLIO_HEADER()        Cabecera de posiciones                   ║
+ * ║  =BALANZ_PORTAFOLIO()               Posiciones actuales                      ║
+ * ║                                                                              ║
+ * ║  ── FCI — FONDOS COMUNES DE INVERSIÓN ──────────────────────────────────    ║
+ * ║  =BALANZ_FCI_CUOTAPARTE(ticker)     Precio cuotaparte actual                 ║
+ * ║  =BALANZ_FCI_VARIACION(ticker)      Variación % vs día anterior              ║
+ * ║  =BALANZ_FCI_VAR_SEMANAL(ticker)    Variación % semanal                      ║
+ * ║  =BALANZ_FCI_VAR_MES(ticker)        Variación % 1 mes                        ║
+ * ║  =BALANZ_FCI_VAR_3MESES(ticker)     Variación % 3 meses                      ║
+ * ║  =BALANZ_FCI_VAR_ANUAL(ticker)      Variación % 12 meses                     ║
+ * ║  =BALANZ_FCI_VAR_YTD(ticker)        Variación % año a la fecha               ║
+ * ║  =BALANZ_FCI_VAR_INICIO(ticker)     Variación % desde inicio del fondo       ║
+ * ║  =BALANZ_FCI_FECHA(ticker)          Fecha del último dato                    ║
+ * ║  =BALANZ_FCI_NOMBRE(ticker)         Nombre completo del fondo                ║
+ * ║  =BALANZ_FCI_NOMBRE_CORTO(ticker)   Categoría / nombre corto                 ║
+ * ║  =BALANZ_FCI_MONEDA(ticker)         Moneda del fondo (ARS / USD)             ║
+ * ║  =BALANZ_FCI(ticker, campo)         Campo libre FCI                          ║
+ * ║  =BALANZ_FCI_FILA(ticker)           Fila completa de datos FCI               ║
+ * ║  =BALANZ_FCI_HEADER()               Cabecera para BALANZ_FCI_FILA            ║
+ * ║  =BALANZ_FCI_HIST(ticker,desde,hasta) Histórico de cuotapartes               ║
  * ║                                                                              ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *  Endpoints verificados:
- *  · Cotización:   /api/v1/cotizacioninstrumento?idCuenta={id}&ticker={t}
- *  · Histórico:    /api/v1/historico/eventos?ticker={t}&plazo=1&fullNormalize=false
- *  · Ev. cartera:  /api/v1/evoluciondecartera/{id}?FechaDesde={d}&FechaHasta={h}&idMoneda=1&Tenencia=1&Eventos=1
- *  · Estado cta:   /api/v1/estadodecuenta/{id}?Fecha={d}&ta=1&idMoneda=1
+ *  · Cotización:    /api/v1/cotizacioninstrumento?idCuenta={id}&ticker={t}
+ *  · Histórico:     /api/v1/historico/eventos?ticker={t}&plazo=1&fullNormalize=false
+ *  · Ev. cartera:   /api/v1/evoluciondecartera/{id}?FechaDesde={d}&FechaHasta={h}&idMoneda=1&Tenencia=1&Eventos=1
+ *  · Estado cta:    /api/v1/estadodecuenta/{id}?Fecha={d}&ta=1&idMoneda=1
+ *  · FCI info:      /api/v1/fondos?ticker={t}
+ *  · FCI histórico: /api/v1/historico/eventos?ticker={t}&plazo=1&fullNormalize=false → valorcuotaparte
  */
 
 // ─── MENÚ ─────────────────────────────────────────────────────────────────────
@@ -191,7 +233,7 @@ function mostrarInstrucciones() {
     <h2>📊 Balanz para Google Sheets</h2>
     <div class="warn">⚠️ El token dura ~8 horas. Renovalo desde 📊 Balanz → 🔑 Pegar token.</div>
 
-    <h3>Bonos — datos actuales</h3>
+    <h3>Bonos / Renta fija</h3>
     <table>
       <tr><th>Fórmula</th><th>Descripción</th></tr>
       <tr><td><code>=BALANZ_PRECIO("AL30D")</code></td><td>Precio limpio</td></tr>
@@ -199,14 +241,30 @@ function mostrarInstrucciones() {
       <tr><td><code>=BALANZ_TNA("AL30D")</code></td><td>Tasa nominal anual</td></tr>
       <tr><td><code>=BALANZ_PARIDAD("AL30D")</code></td><td>Paridad</td></tr>
       <tr><td><code>=BALANZ_DURATION("AL30D")</code></td><td>Duration modificada</td></tr>
+      <tr><td><code>=BALANZ_MACAULAY("AL30D")</code></td><td>Duration de Macaulay</td></tr>
       <tr><td><code>=BALANZ_CONVEXITY("AL30D")</code></td><td>Convexity</td></tr>
       <tr><td><code>=BALANZ_CY("AL30D")</code></td><td>Current Yield</td></tr>
+      <tr><td><code>=BALANZ_VENCIMIENTO("AL30D")</code></td><td>Fecha de vencimiento</td></tr>
+      <tr><td><code>=BALANZ_EMISION("AL30D")</code></td><td>Fecha de emisión</td></tr>
+      <tr><td><code>=BALANZ_PROXIMO_PAGO("AL30D")</code></td><td>Fecha próximo pago</td></tr>
+      <tr><td><code>=BALANZ_PROXIMO_PAGO_INFO("AL30D")</code></td><td>Info próximo pago</td></tr>
+      <tr><td><code>=BALANZ_DIAS_PAGO("AL30D")</code></td><td>Días hasta próximo pago</td></tr>
+      <tr><td><code>=BALANZ_CUPON("AL30D")</code></td><td>Tasa de cupón</td></tr>
+      <tr><td><code>=BALANZ_TIPO_CUPON("AL30D")</code></td><td>Tipo de cupón</td></tr>
+      <tr><td><code>=BALANZ_FRECUENCIA("AL30D")</code></td><td>Frecuencia de pagos</td></tr>
+      <tr><td><code>=BALANZ_RESIDUAL("AL30D")</code></td><td>Valor residual</td></tr>
+      <tr><td><code>=BALANZ_VALOR_TECNICO("AL30D")</code></td><td>Valor técnico</td></tr>
+      <tr><td><code>=BALANZ_INTERES_DEV("AL30D")</code></td><td>Interés devengado</td></tr>
+      <tr><td><code>=BALANZ_MONEDA("AL30D")</code></td><td>Moneda (USD / ARS)</td></tr>
+      <tr><td><code>=BALANZ_JURISDICCION("AL30D")</code></td><td>Jurisdicción (ARG / NY)</td></tr>
+      <tr><td><code>=BALANZ_ISIN("AL30D")</code></td><td>Código ISIN</td></tr>
       <tr><td><code>=BALANZ_NOMBRE("AL30D")</code></td><td>Nombre del instrumento</td></tr>
     </table>
 
-    <h3>Cualquier instrumento (acciones, CEDEARs, fondos, bonos)</h3>
+    <h3>Campo libre — cualquier instrumento</h3>
     <table>
       <tr><th>Fórmula</th><th>Descripción</th></tr>
+      <tr><td><code>=BALANZ("AL30D","vencimiento")</code></td><td>Campo libre</td></tr>
       <tr><td><code>=BALANZ_ULTIMO("GGAL")</code></td><td>Último precio</td></tr>
       <tr><td><code>=BALANZ_VARIACION("GGAL")</code></td><td>Variación % del día</td></tr>
       <tr><td><code>=BALANZ_VOLUMEN("GGAL")</code></td><td>Volumen operado</td></tr>
@@ -215,10 +273,17 @@ function mostrarInstrucciones() {
       <tr><td><code>=BALANZ_MINIMO("GGAL")</code></td><td>Mínimo del día</td></tr>
       <tr><td><code>=BALANZ_CIERRE("GGAL")</code></td><td>Cierre anterior</td></tr>
       <tr><td><code>=BALANZ_VWAP("GGAL")</code></td><td>VWAP del día</td></tr>
-      <tr><td><code>=BALANZ("GGAL","variacion")</code></td><td>Campo libre</td></tr>
-      <tr><td><code>=BALANZ_FILA("GGAL")</code></td><td>Fila completa</td></tr>
+      <tr><td><code>=BALANZ_FILA("AL30D")</code></td><td>Fila completa</td></tr>
       <tr><td><code>=BALANZ_HEADER()</code></td><td>Cabecera para BALANZ_FILA</td></tr>
     </table>
+    <div class="box">
+      Campos para =BALANZ(ticker, campo):<br>
+      precio · tir · ytm · tna · paridad · duration · macaulay · convexity · cy · currentyield<br>
+      descripcion · nombre · ultimo · variacion · volumen · apertura · maximo · minimo · cierre · vwap<br>
+      vencimiento · emision · proximopago · proximopagoinfo · diaspago<br>
+      cupon · tipocupon · frecuencia · residual · valortecnico · interesdev<br>
+      moneda · jurisdiccion · isin
+    </div>
 
     <h3>Histórico de precios OHLCV</h3>
     <table>
@@ -230,13 +295,13 @@ function mostrarInstrucciones() {
       <tr><td><code>=BALANZ_HIST_OHLCV("AL30D","2024-01-01","2024-12-31")</code></td><td>Tabla OHLCV completa</td></tr>
       <tr><td><code>=BALANZ_HIST("AL30D","2024-01-01","2024-12-31","apertura")</code></td><td>Campo libre histórico</td></tr>
     </table>
-    <div class="box">Campos disponibles para BALANZ_HIST: apertura · cierre · maximo · minimo · volumen · nominal</div>
+    <div class="box">Campos para BALANZ_HIST: apertura · cierre · maximo · minimo · volumen · nominal</div>
 
     <h3>Evolución histórica de cartera</h3>
     <table>
       <tr><th>Fórmula</th><th>Descripción</th></tr>
       <tr><td><code>=BALANZ_EVOL_HEADER()</code></td><td>Cabecera</td></tr>
-      <tr><td><code>=BALANZ_EVOL("2025-01-01","2026-03-05")</code></td><td>Evolución de tenencia diaria</td></tr>
+      <tr><td><code>=BALANZ_EVOL("2025-01-01","2026-03-09")</code></td><td>Evolución de tenencia diaria</td></tr>
     </table>
 
     <h3>Estado actual de cuenta</h3>
@@ -252,7 +317,31 @@ function mostrarInstrucciones() {
       <tr><td><code>=BALANZ_PORTAFOLIO_HEADER()</code></td><td>Cabecera posiciones</td></tr>
       <tr><td><code>=BALANZ_PORTAFOLIO()</code></td><td>Posiciones actuales</td></tr>
     </table>
-  `).setTitle('📖 Fórmulas Balanz').setWidth(440).setHeight(680);
+
+    <h3>FCI — Fondos Comunes de Inversión</h3>
+    <div class="warn">ℹ️ Balanz no expone volumen ni patrimonio por API para FCI. Las variaciones se calculan desde el histórico de cuotapartes.</div>
+    <table>
+      <tr><th>Fórmula</th><th>Descripción</th></tr>
+      <tr><td><code>=BALANZ_FCI_CUOTAPARTE("BCAHA")</code></td><td>Precio cuotaparte actual</td></tr>
+      <tr><td><code>=BALANZ_FCI_VARIACION("BCAHA")</code></td><td>Variación % vs día anterior</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_SEMANAL("BCAHA")</code></td><td>Variación % semanal (~5 háb.)</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_MES("BCAHA")</code></td><td>Variación % 1 mes (~21 háb.)</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_3MESES("BCAHA")</code></td><td>Variación % 3 meses</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_ANUAL("BCAHA")</code></td><td>Variación % 12 meses</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_YTD("BCAHA")</code></td><td>Variación % año a la fecha</td></tr>
+      <tr><td><code>=BALANZ_FCI_VAR_INICIO("BCAHA")</code></td><td>Variación % desde inicio</td></tr>
+      <tr><td><code>=BALANZ_FCI_FECHA("BCAHA")</code></td><td>Fecha del último dato</td></tr>
+      <tr><td><code>=BALANZ_FCI_NOMBRE("BCAHA")</code></td><td>Nombre completo del fondo</td></tr>
+      <tr><td><code>=BALANZ_FCI_NOMBRE_CORTO("BCAHA")</code></td><td>Categoría / nombre corto</td></tr>
+      <tr><td><code>=BALANZ_FCI_MONEDA("BCAHA")</code></td><td>Moneda (ARS / USD)</td></tr>
+      <tr><td><code>=BALANZ_FCI("BCAHA","varytd")</code></td><td>Campo libre FCI</td></tr>
+      <tr><td><code>=BALANZ_FCI_FILA("BCAHA")</code></td><td>Fila completa</td></tr>
+      <tr><td><code>=BALANZ_FCI_HEADER()</code></td><td>Cabecera para BALANZ_FCI_FILA</td></tr>
+      <tr><td><code>=BALANZ_FCI_HIST("BCAHA","2026-01-01","2026-03-09")</code></td><td>Histórico cuotapartes</td></tr>
+    </table>
+    <div class="box">Campos para =BALANZ_FCI(ticker, campo):<br>
+    cuotaparte · variacion · vardiaria · varsemanal · varmes · var3meses · varanual · varytd · varinicio · fecha · nombre · corto · moneda</div>
+  `).setTitle('📖 Fórmulas Balanz').setWidth(440).setHeight(900);
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
@@ -268,10 +357,6 @@ function getCuenta_() {
   return PropertiesService.getUserProperties().getProperty('balanz_id_cuenta') || '';
 }
 
-/**
- * GET autenticado contra la API de Balanz.
- * Lanza error descriptivo si el token venció o hay otro problema.
- */
 function balanzGet_(url) {
   const resp = UrlFetchApp.fetch(url, {
     method: "GET",
@@ -292,20 +377,18 @@ function balanzGet_(url) {
   return JSON.parse(resp.getContentText());
 }
 
-/** Convierte valores porcentuales que pueden venir como "10.02%" o como 10.02 */
 function pct_(val) {
   if (!val && val !== 0) return 0;
   const n = parseFloat(String(val).replace("%","").trim());
   return isNaN(n) ? 0 : (n > 1 ? n / 100 : n);
 }
 
-/** Formatea fecha YYYY-MM-DD a YYYYMMDD (para parámetros de API) */
 function fmtFecha_(fecha) {
   if (!fecha) return '';
   return String(fecha).replace(/-/g, '').replace(/\//g, '').substring(0, 8);
 }
 
-// ─── COTIZACIÓN ACTUAL (bonos, acciones, cedears, fondos) ─────────────────────
+// ─── COTIZACIÓN ACTUAL ────────────────────────────────────────────────────────
 
 function fetchCotiz_(ticker) {
   const t = String(ticker).trim().toUpperCase();
@@ -319,29 +402,47 @@ function parseCotiz_(json, ticker) {
   const bond  = json.bond       || {};
   const cotiz = json.Cotizacion || {};
   return {
-    descripcion:  cotiz.Descripcion || bond.description || String(ticker).toUpperCase(),
-    precio:       parseFloat(bond.cleanPrice       || cotiz.UltimoPrecio)        || 0,
-    tir:          pct_(bond.yield),
-    tna:          pct_(bond.annualNominalRate),
-    paridad:      parseFloat(bond.parity)          || 0,
-    duration:     parseFloat(bond.duration)        || 0,
-    convexity:    parseFloat(bond.convexity)       || 0,
-    currentYield: pct_(bond.currentYield),
-    ultimo:       parseFloat(cotiz.UltimoPrecio)   || parseFloat(bond.cleanPrice) || 0,
-    variacion:    parseFloat(cotiz.pcp)            || 0,   // ya viene en %
-    volumen:      parseFloat(cotiz.Volumen)        || 0,
-    apertura:     parseFloat(cotiz.PrecioApertura) || 0,
-    maximo:       parseFloat(cotiz.PrecioMaximo)   || 0,
-    minimo:       parseFloat(cotiz.PrecioMinimo)   || 0,
-    cierre:       parseFloat(cotiz.PrecioCierreAnterior) || 0,
-    vwap:         parseFloat(cotiz.vwap)           || 0,
+    // ── Descripción ───────────────────────────────────────────────────────────
+    descripcion:      cotiz.Descripcion      || bond.description  || String(ticker).toUpperCase(),
+    // ── Precio y cotización ───────────────────────────────────────────────────
+    precio:           parseFloat(bond.cleanPrice            || cotiz.UltimoPrecio)   || 0,
+    ultimo:           parseFloat(cotiz.UltimoPrecio)        || parseFloat(bond.cleanPrice) || 0,
+    variacion:        parseFloat(cotiz.pcp)                 || 0,   // ya en %
+    volumen:          parseFloat(cotiz.Volumen)             || 0,
+    apertura:         parseFloat(cotiz.PrecioApertura)      || 0,
+    maximo:           parseFloat(cotiz.PrecioMaximo)        || 0,
+    minimo:           parseFloat(cotiz.PrecioMinimo)        || 0,
+    cierre:           parseFloat(cotiz.PrecioCierreAnterior)|| 0,
+    vwap:             parseFloat(cotiz.vwap)                || 0,
+    // ── Renta fija — análisis ─────────────────────────────────────────────────
+    tir:              pct_(bond.yield),
+    tna:              pct_(bond.annualNominalRate),
+    paridad:          parseFloat(bond.parity)               || 0,
+    duration:         parseFloat(bond.duration)             || 0,
+    macaulay:         parseFloat(bond.macaulayDuration)     || 0,
+    convexity:        parseFloat(bond.convexity)            || 0,
+    currentYield:     pct_(bond.currentYield),
+    valorTecnico:     parseFloat(bond.technicalValue)       || 0,
+    interesDevengado: parseFloat(bond.accruedInterest)      || 0,
+    residual:         parseFloat(bond.residual)             || 0,
+    // ── Renta fija — estructura ───────────────────────────────────────────────
+    vencimiento:      bond.maturity          || "",   // "YYYY-MM-DD"
+    emision:          bond.issuanceDate      || "",   // "YYYY-MM-DD"
+    proximoPago:      bond.nextPaymentDate   || "",   // "YYYY-MM-DD"
+    proximoPagoInfo:  bond.nextPaymentInfo   || "",   // "Renta X% + Amort. Y%"
+    diasProximoPago:  parseInt(bond.nextPaymentDays  || 0),
+    cupon:            bond.coupon            || "",   // "0.75%"
+    tipoCupon:        bond.couponType        || "",   // "Fixed rate"
+    frecuencia:       bond.frequency         || "",   // "Semiannual"
+    tipoAmort:        bond.amortizationType  || "",   // "Sinkable"
+    // ── Identificación ────────────────────────────────────────────────────────
+    moneda:           bond.currency          || "",   // "USD"
+    jurisdiccion:     bond.jurisdiction      || "",   // "ARG" / "NY"
+    isin:             cotiz.ISIN             || "",
   };
 }
 
 // ─── HISTÓRICO DE PRECIOS ─────────────────────────────────────────────────────
-// Endpoint verificado: /api/v1/historico/eventos?ticker=AE38&plazo=1&fullNormalize=false
-// Campos JSON: fecha, precioapertura, preciocierre, preciominimo, preciomaximo,
-//              totalnominal, volumen, ultimoprecio
 
 /**
  * Histórico de precios para cualquier instrumento.
@@ -356,24 +457,16 @@ function BALANZ_HIST(ticker, desde, hasta, campo) {
   if (!ticker) return [["Falta ticker"]];
   const t = String(ticker).trim().toUpperCase();
   const c = (campo || "cierre").toLowerCase().trim();
-
   const json = balanzGet_(
     `https://clientes.balanz.com/api/v1/historico/eventos?ticker=${encodeURIComponent(t)}&plazo=1&fullNormalize=false`
   );
-
   let rows = json.historico || json.data || json || [];
   if (!Array.isArray(rows) || rows.length === 0) return [["Sin datos para " + t]];
-
-  // Filtrar por rango de fechas si se especificó
   if (desde || hasta) {
     const d0 = desde ? new Date(desde) : null;
     const d1 = hasta ? new Date(hasta) : null;
-    rows = rows.filter(r => {
-      const f = new Date(r.fecha);
-      return (!d0 || f >= d0) && (!d1 || f <= d1);
-    });
+    rows = rows.filter(r => { const f = new Date(r.fecha); return (!d0 || f >= d0) && (!d1 || f <= d1); });
   }
-
   const campoMap = {
     apertura: r => parseFloat(r.precioapertura) || 0,
     cierre:   r => parseFloat(r.preciocierre)   || parseFloat(r.ultimoprecio) || 0,
@@ -384,7 +477,6 @@ function BALANZ_HIST(ticker, desde, hasta, campo) {
     ultimo:   r => parseFloat(r.ultimoprecio)   || 0,
   };
   const fn = campoMap[c] || campoMap["cierre"];
-
   const label = c.charAt(0).toUpperCase() + c.slice(1);
   const out = [["Fecha", label]];
   rows.forEach(r => out.push([r.fecha, fn(r)]));
@@ -428,7 +520,7 @@ function BALANZ_HIST_MINIMO(ticker, desde, hasta)  { return BALANZ_HIST(ticker, 
 function BALANZ_HIST_VOLUMEN(ticker, desde, hasta) { return BALANZ_HIST(ticker, desde, hasta, "volumen"); }
 
 /**
- * Tabla completa OHLCV (Apertura, Máximo, Mínimo, Cierre, Volumen).
+ * Tabla completa OHLCV.
  * @param {string} ticker  Ej: "AL30D"
  * @param {string} desde   "YYYY-MM-DD" (opcional)
  * @param {string} hasta   "YYYY-MM-DD" (opcional)
@@ -437,23 +529,16 @@ function BALANZ_HIST_VOLUMEN(ticker, desde, hasta) { return BALANZ_HIST(ticker, 
 function BALANZ_HIST_OHLCV(ticker, desde, hasta) {
   if (!ticker) return [["Falta ticker"]];
   const t = String(ticker).trim().toUpperCase();
-
   const json = balanzGet_(
     `https://clientes.balanz.com/api/v1/historico/eventos?ticker=${encodeURIComponent(t)}&plazo=1&fullNormalize=false`
   );
-
   let rows = json.historico || json.data || json || [];
   if (!Array.isArray(rows) || rows.length === 0) return [["Sin datos para " + t]];
-
   if (desde || hasta) {
     const d0 = desde ? new Date(desde) : null;
     const d1 = hasta ? new Date(hasta) : null;
-    rows = rows.filter(r => {
-      const f = new Date(r.fecha);
-      return (!d0 || f >= d0) && (!d1 || f <= d1);
-    });
+    rows = rows.filter(r => { const f = new Date(r.fecha); return (!d0 || f >= d0) && (!d1 || f <= d1); });
   }
-
   const out = [["Fecha", "Apertura", "Máximo", "Mínimo", "Cierre", "Volumen", "Nominal"]];
   rows.forEach(r => out.push([
     r.fecha,
@@ -468,9 +553,6 @@ function BALANZ_HIST_OHLCV(ticker, desde, hasta) {
 }
 
 // ─── EVOLUCIÓN HISTÓRICA DE CARTERA ──────────────────────────────────────────
-// Endpoint verificado: /api/v1/evoluciondecartera/{idCuenta}?FechaDesde=YYYYMMDD&FechaHasta=YYYYMMDD&idMoneda=1&Tenencia=1&Eventos=1
-// Campos JSON: Fecha, Tenencia, Dolares, Pesos, Bonos, FCI, Acciones, Monedas,
-//              MonedasPesos, MonedasDolares, Opciones
 
 /**
  * Cabecera para BALANZ_EVOL.
@@ -482,42 +564,34 @@ function BALANZ_EVOL_HEADER() {
 
 /**
  * Evolución histórica de cartera entre dos fechas.
- * @param {string} desde  Fecha inicio "YYYY-MM-DD"
- * @param {string} hasta  Fecha fin    "YYYY-MM-DD"
+ * @param {string} desde  "YYYY-MM-DD"
+ * @param {string} hasta  "YYYY-MM-DD"
  * @customfunction
  */
 function BALANZ_EVOL(desde, hasta) {
   const cuenta = getCuenta_();
   if (!cuenta) return [["ID de cuenta no configurado — pegá el token con idCuenta"]];
-
   const d = fmtFecha_(desde || Utilities.formatDate(new Date(Date.now() - 30*86400000), "UTC", "yyyy-MM-dd"));
   const h = fmtFecha_(hasta || Utilities.formatDate(new Date(), "UTC", "yyyy-MM-dd"));
-
-  const url  = `https://clientes.balanz.com/api/v1/evoluciondecartera/${cuenta}?FechaDesde=${d}&FechaHasta=${h}&idMoneda=1&Tenencia=1&Eventos=1`;
-  const json = balanzGet_(url);
-
+  const json = balanzGet_(
+    `https://clientes.balanz.com/api/v1/evoluciondecartera/${cuenta}?FechaDesde=${d}&FechaHasta=${h}&idMoneda=1&Tenencia=1&Eventos=1`
+  );
   const rows = json.evolucion || json.historico || json.data || json || [];
   if (!Array.isArray(rows) || rows.length === 0) return [["Sin datos en ese rango de fechas"]];
-
   return rows.map(r => [
-    r.Fecha        || r.fecha        || "",
-    parseFloat(r.Tenencia      || 0),
-    parseFloat(r.Pesos         || 0),
-    parseFloat(r.Dolares       || 0),
-    parseFloat(r.Bonos         || 0),
-    parseFloat(r.FCI           || 0),
-    parseFloat(r.Acciones      || 0),
-    parseFloat(r.Monedas       || 0),
-    parseFloat(r.Opciones      || 0),
+    r.Fecha     || r.fecha     || "",
+    parseFloat(r.Tenencia || 0),
+    parseFloat(r.Pesos    || 0),
+    parseFloat(r.Dolares  || 0),
+    parseFloat(r.Bonos    || 0),
+    parseFloat(r.FCI      || 0),
+    parseFloat(r.Acciones || 0),
+    parseFloat(r.Monedas  || 0),
+    parseFloat(r.Opciones || 0),
   ]);
 }
 
-// ─── ESTADO DE CUENTA (saldos, tenencias, portafolio) ─────────────────────────
-// Endpoint verificado: /api/v1/estadodecuenta/{idCuenta}?Fecha=YYYYMMDD&ta=1&idMoneda=1
-// Campos JSON verificados:
-//   liquidez[].idMoneda / .DInm (CI) / .D24 (24hs) / .CotizacionMEP
-//   tenenciaActual[].TotalPesos / .CotizacionMEP / .CotizacionCCL
-//   tenencia[] / tenenciaAgrupada[]
+// ─── ESTADO DE CUENTA ─────────────────────────────────────────────────────────
 
 function fetchEstadoCuenta_() {
   const cuenta = getCuenta_();
@@ -529,12 +603,11 @@ function fetchEstadoCuenta_() {
 }
 
 /**
- * Saldo disponible en pesos — liquidación inmediata (CI).
+ * Saldo disponible en pesos — CI.
  * @customfunction
  */
 function BALANZ_SALDO() {
-  const json = fetchEstadoCuenta_();
-  const liq  = (json.liquidez || []).find(l => l.idMoneda === 1) || {};
+  const liq = (fetchEstadoCuenta_().liquidez || []).find(l => l.idMoneda === 1) || {};
   return parseFloat(liq.DInm || liq.D24 || 0);
 }
 
@@ -543,18 +616,16 @@ function BALANZ_SALDO() {
  * @customfunction
  */
 function BALANZ_SALDO_24() {
-  const json = fetchEstadoCuenta_();
-  const liq  = (json.liquidez || []).find(l => l.idMoneda === 1) || {};
+  const liq = (fetchEstadoCuenta_().liquidez || []).find(l => l.idMoneda === 1) || {};
   return parseFloat(liq.D24 || 0);
 }
 
 /**
- * Saldo disponible en dólares — liquidación inmediata (CI).
+ * Saldo disponible en dólares — CI.
  * @customfunction
  */
 function BALANZ_SALDO_USD() {
-  const json = fetchEstadoCuenta_();
-  const liq  = (json.liquidez || []).find(l => l.idMoneda === 2) || {};
+  const liq = (fetchEstadoCuenta_().liquidez || []).find(l => l.idMoneda === 2) || {};
   return parseFloat(liq.DInm || liq.D24 || 0);
 }
 
@@ -563,8 +634,7 @@ function BALANZ_SALDO_USD() {
  * @customfunction
  */
 function BALANZ_SALDO_USD_24() {
-  const json = fetchEstadoCuenta_();
-  const liq  = (json.liquidez || []).find(l => l.idMoneda === 2) || {};
+  const liq = (fetchEstadoCuenta_().liquidez || []).find(l => l.idMoneda === 2) || {};
   return parseFloat(liq.D24 || 0);
 }
 
@@ -575,7 +645,6 @@ function BALANZ_SALDO_USD_24() {
 function BALANZ_MEP() {
   const json   = fetchEstadoCuenta_();
   const actual = (json.tenenciaActual || [])[0] || {};
-  // También puede venir en cotizacionesDolar
   if (actual.CotizacionMEP) return parseFloat(actual.CotizacionMEP);
   const mep = (json.cotizacionesDolar || []).find(d => d.tipo === 2 || (d.Descripcion||"").toLowerCase().includes("mep"));
   return parseFloat((mep || {}).PrecioVenta || (mep || {}).PrecioCompra || 0);
@@ -598,8 +667,7 @@ function BALANZ_CCL() {
  * @customfunction
  */
 function BALANZ_TENENCIA_TOTAL() {
-  const json   = fetchEstadoCuenta_();
-  const actual = (json.tenenciaActual || [])[0] || {};
+  const actual = (fetchEstadoCuenta_().tenenciaActual || [])[0] || {};
   return parseFloat(actual.TotalPesos || actual.Total || 0);
 }
 
@@ -612,43 +680,32 @@ function BALANZ_PORTAFOLIO_HEADER() {
 }
 
 /**
- * Posiciones actuales de la cuenta (tenencias).
+ * Posiciones actuales de la cuenta.
  * @customfunction
  */
 function BALANZ_PORTAFOLIO() {
-  const json  = fetchEstadoCuenta_();
-
-  // Balanz puede devolver las posiciones en tenencia, tenenciaAgrupada, o items dentro de cada uno
+  const json = fetchEstadoCuenta_();
   let items = [];
-
-  // tenenciaAgrupada suele tener grupos con sub-items
   const agrupada = json.tenenciaAgrupada || [];
   agrupada.forEach(grupo => {
     const sub = grupo.tenencia || grupo.items || grupo.Tenencia || [];
     if (Array.isArray(sub)) items = items.concat(sub);
     else if (grupo.Ticker || grupo.ticker) items.push(grupo);
   });
-
-  // tenencia plana
-  if (items.length === 0) {
-    items = json.tenencia || [];
-  }
-
-  if (!Array.isArray(items) || items.length === 0) {
+  if (items.length === 0) items = json.tenencia || [];
+  if (!Array.isArray(items) || items.length === 0)
     return [["Sin posiciones — la cuenta puede estar vacía o los datos aún no cargaron"]];
-  }
-
   return items.map(i => [
-    i.Ticker        || i.ticker        || i.Simbolo   || "",
-    i.Descripcion   || i.descripcion   || i.Nombre    || "",
-    parseFloat(i.Cantidad    || i.cantidad    || 0),
-    parseFloat(i.Disponible  || i.disponible  || 0),
-    parseFloat(i.PrecioCosto || i.precioCosto || i.PrecioPromedio || 0),
-    parseFloat(i.PrecioActual|| i.precioActual|| i.UltimoPrecio   || 0),
-    parseFloat(i.ValorActual || i.valorActual || 0),
-    parseFloat(i.Rendimiento || i.rendimiento || i.GananciaPesos  || 0),
+    i.Ticker         || i.ticker         || i.Simbolo          || "",
+    i.Descripcion    || i.descripcion    || i.Nombre           || "",
+    parseFloat(i.Cantidad        || i.cantidad        || 0),
+    parseFloat(i.Disponible      || i.disponible      || 0),
+    parseFloat(i.PrecioCosto     || i.precioCosto     || i.PrecioPromedio   || 0),
+    parseFloat(i.PrecioActual    || i.precioActual    || i.UltimoPrecio     || 0),
+    parseFloat(i.ValorActual     || i.valorActual     || 0),
+    parseFloat(i.Rendimiento     || i.rendimiento     || i.GananciaPesos    || 0),
     parseFloat(i.RendimientoPorc || i.rendimientoPorc || i.GananciaPorcentaje || 0),
-    i.Moneda        || i.moneda        || "",
+    i.Moneda || i.moneda || "",
   ]);
 }
 
@@ -662,7 +719,7 @@ function BALANZ_PORTAFOLIO() {
 function BALANZ_PRECIO(ticker)    { return parseCotiz_(fetchCotiz_(ticker), ticker).precio; }
 
 /**
- * TIR / YTM del bono (número decimal, ej 0.1002 = 10.02%).
+ * TIR / YTM del bono (decimal, ej: 0.0944 = 9.44%).
  * @param {string} ticker  Ej: "AL30D"
  * @customfunction
  */
@@ -676,7 +733,7 @@ function BALANZ_TIR(ticker)       { return parseCotiz_(fetchCotiz_(ticker), tick
 function BALANZ_TNA(ticker)       { return parseCotiz_(fetchCotiz_(ticker), ticker).tna; }
 
 /**
- * Paridad del bono (decimal, ej 0.785 = 78.5%).
+ * Paridad del bono (decimal, ej: 0.840 = 84%).
  * @param {string} ticker  Ej: "AL30D"
  * @customfunction
  */
@@ -688,6 +745,13 @@ function BALANZ_PARIDAD(ticker)   { return parseCotiz_(fetchCotiz_(ticker), tick
  * @customfunction
  */
 function BALANZ_DURATION(ticker)  { return parseCotiz_(fetchCotiz_(ticker), ticker).duration; }
+
+/**
+ * Duration de Macaulay del bono.
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_MACAULAY(ticker)  { return parseCotiz_(fetchCotiz_(ticker), ticker).macaulay; }
 
 /**
  * Convexity del bono.
@@ -712,13 +776,13 @@ function BALANZ_NOMBRE(ticker)    { return parseCotiz_(fetchCotiz_(ticker), tick
 
 /**
  * Último precio del instrumento.
- * @param {string} ticker  Ej: "GGAL", "AL30D", "AAPLC"
+ * @param {string} ticker  Ej: "GGAL", "AL30D"
  * @customfunction
  */
 function BALANZ_ULTIMO(ticker)    { return parseCotiz_(fetchCotiz_(ticker), ticker).ultimo; }
 
 /**
- * Variación porcentual del día (decimal, ej 0.0394 = 3.94%).
+ * Variación porcentual del día (decimal, ej: 0.0394 = 3.94%).
  * @param {string} ticker  Ej: "GGAL"
  * @customfunction
  */
@@ -767,24 +831,153 @@ function BALANZ_CIERRE(ticker)    { return parseCotiz_(fetchCotiz_(ticker), tick
 function BALANZ_VWAP(ticker)      { return parseCotiz_(fetchCotiz_(ticker), ticker).vwap; }
 
 /**
- * Campo libre de cualquier instrumento.
- * @param {string} ticker  Ej: "AL30D", "GGAL", "AAPLC"
- * @param {string} campo   precio|tir|tna|paridad|duration|convexity|cy|descripcion|ultimo|variacion|volumen|apertura|maximo|minimo|cierre|vwap
+ * Fecha de vencimiento del bono (YYYY-MM-DD).
+ * @param {string} ticker  Ej: "AL30D", "AE38", "GD30D"
+ * @customfunction
+ */
+function BALANZ_VENCIMIENTO(ticker)       { return parseCotiz_(fetchCotiz_(ticker), ticker).vencimiento; }
+
+/**
+ * Fecha de emisión del bono (YYYY-MM-DD).
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_EMISION(ticker)           { return parseCotiz_(fetchCotiz_(ticker), ticker).emision; }
+
+/**
+ * Fecha del próximo pago de cupón/amortización (YYYY-MM-DD).
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_PROXIMO_PAGO(ticker)      { return parseCotiz_(fetchCotiz_(ticker), ticker).proximoPago; }
+
+/**
+ * Descripción del próximo pago (ej: "Renta 0.75% + Amort. 8%").
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_PROXIMO_PAGO_INFO(ticker) { return parseCotiz_(fetchCotiz_(ticker), ticker).proximoPagoInfo; }
+
+/**
+ * Días hasta el próximo pago.
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_DIAS_PAGO(ticker)         { return parseCotiz_(fetchCotiz_(ticker), ticker).diasProximoPago; }
+
+/**
+ * Tasa de cupón del bono (ej: "0.75%").
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_CUPON(ticker)             { return parseCotiz_(fetchCotiz_(ticker), ticker).cupon; }
+
+/**
+ * Tipo de cupón (ej: "Fixed rate").
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_TIPO_CUPON(ticker)        { return parseCotiz_(fetchCotiz_(ticker), ticker).tipoCupon; }
+
+/**
+ * Frecuencia de pagos (ej: "Semiannual").
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_FRECUENCIA(ticker)        { return parseCotiz_(fetchCotiz_(ticker), ticker).frecuencia; }
+
+/**
+ * Valor residual del bono (decimal, ej: 0.72 = 72%).
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_RESIDUAL(ticker)          { return parseCotiz_(fetchCotiz_(ticker), ticker).residual; }
+
+/**
+ * Valor técnico del bono.
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_VALOR_TECNICO(ticker)     { return parseCotiz_(fetchCotiz_(ticker), ticker).valorTecnico; }
+
+/**
+ * Interés devengado del bono.
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_INTERES_DEV(ticker)       { return parseCotiz_(fetchCotiz_(ticker), ticker).interesDevengado; }
+
+/**
+ * Moneda del bono (ej: "USD").
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_MONEDA(ticker)            { return parseCotiz_(fetchCotiz_(ticker), ticker).moneda; }
+
+/**
+ * Jurisdicción del bono ("ARG" = ley local, "NY" = ley Nueva York).
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_JURISDICCION(ticker)      { return parseCotiz_(fetchCotiz_(ticker), ticker).jurisdiccion; }
+
+/**
+ * Código ISIN del instrumento.
+ * @param {string} ticker  Ej: "AL30D"
+ * @customfunction
+ */
+function BALANZ_ISIN(ticker)              { return parseCotiz_(fetchCotiz_(ticker), ticker).isin; }
+
+/**
+ * Campo libre — obtiene cualquier dato de cualquier instrumento.
+ * @param {string} ticker  Ej: "AL30D", "GGAL", "AE38"
+ * @param {string} campo   Ver lista completa en el encabezado del script
  * @customfunction
  */
 function BALANZ(ticker, campo) {
   if (!ticker) return "Falta ticker";
   if (!campo)  return "Falta campo";
-  const c = String(campo).trim().toLowerCase().replace(/[^a-z]/g,"");
+  const c = String(campo).trim().toLowerCase().replace(/[^a-z]/g, "");
   const d = parseCotiz_(fetchCotiz_(ticker), ticker);
   const m = {
-    precio:d.precio, tir:d.tir, ytm:d.tir, tna:d.tna,
-    paridad:d.paridad, duration:d.duration, convexity:d.convexity,
-    cy:d.currentYield, currentyield:d.currentYield,
-    descripcion:d.descripcion, nombre:d.descripcion,
-    ultimo:d.ultimo, variacion:d.variacion/100,
-    volumen:d.volumen, apertura:d.apertura,
-    maximo:d.maximo, minimo:d.minimo, cierre:d.cierre, vwap:d.vwap,
+    // Precio y cotización
+    precio:          d.precio,
+    ultimo:          d.ultimo,
+    variacion:       d.variacion / 100,
+    volumen:         d.volumen,
+    apertura:        d.apertura,
+    maximo:          d.maximo,
+    minimo:          d.minimo,
+    cierre:          d.cierre,
+    vwap:            d.vwap,
+    // Análisis renta fija
+    tir:             d.tir,
+    ytm:             d.tir,
+    tna:             d.tna,
+    paridad:         d.paridad,
+    duration:        d.duration,
+    macaulay:        d.macaulay,
+    convexity:       d.convexity,
+    cy:              d.currentYield,
+    currentyield:    d.currentYield,
+    valortecnico:    d.valorTecnico,
+    interesdev:      d.interesDevengado,
+    residual:        d.residual,
+    // Estructura del bono
+    vencimiento:     d.vencimiento,
+    emision:         d.emision,
+    proximopago:     d.proximoPago,
+    proximopagoinfo: d.proximoPagoInfo,
+    diaspago:        d.diasProximoPago,
+    cupon:           d.cupon,
+    tipocupon:       d.tipoCupon,
+    frecuencia:      d.frecuencia,
+    // Identificación
+    descripcion:     d.descripcion,
+    nombre:          d.descripcion,
+    moneda:          d.moneda,
+    jurisdiccion:    d.jurisdiccion,
+    isin:            d.isin,
   };
   return (c in m) ? m[c] : "Campo inválido: " + campo;
 }
@@ -798,8 +991,35 @@ function BALANZ_FILA(ticker) {
   if (!ticker) return [["Falta ticker"]];
   const t = String(ticker).trim().toUpperCase();
   const d = parseCotiz_(fetchCotiz_(t), t);
-  return [[t, d.descripcion, d.ultimo, d.variacion/100, d.volumen,
-           d.paridad, d.tir, d.tna, d.duration, d.convexity, d.currentYield, d.precio]];
+  return [[
+    t,
+    d.descripcion,
+    d.ultimo,
+    d.variacion / 100,
+    d.volumen,
+    d.vencimiento,
+    d.emision,
+    d.proximoPago,
+    d.diasProximoPago,
+    d.proximoPagoInfo,
+    d.paridad,
+    d.tir,
+    d.tna,
+    d.duration,
+    d.macaulay,
+    d.convexity,
+    d.currentYield,
+    d.precio,
+    d.valorTecnico,
+    d.interesDevengado,
+    d.residual,
+    d.cupon,
+    d.tipoCupon,
+    d.frecuencia,
+    d.moneda,
+    d.jurisdiccion,
+    d.isin,
+  ]];
 }
 
 /**
@@ -807,6 +1027,241 @@ function BALANZ_FILA(ticker) {
  * @customfunction
  */
 function BALANZ_HEADER() {
-  return [["Ticker","Descripción","Último","Variación %","Volumen",
-           "Paridad","TIR","TNA","Duration","Convexity","Current Yield","Precio Limpio"]];
+  return [[
+    "Ticker","Descripción","Último","Variación %","Volumen",
+    "Vencimiento","Emisión","Próximo Pago","Días al Pago","Info Próximo Pago",
+    "Paridad","TIR","TNA","Duration","Macaulay","Convexity",
+    "Current Yield","Precio Limpio","Valor Técnico","Interés Dev.","Residual",
+    "Cupón","Tipo Cupón","Frecuencia",
+    "Moneda","Jurisdicción","ISIN",
+  ]];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//   SECCIÓN FCI — FONDOS COMUNES DE INVERSIÓN
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+//  Endpoints confirmados:
+//  · Info:      GET /api/v1/fondos?ticker={t}  → Descripcion, NombreCorto, idMoneda
+//  · Histórico: GET /api/v1/historico/eventos?ticker={t}&plazo=1&fullNormalize=false
+//               → { historico: [ { fecha, valorcuotaparte } ] }
+//
+//  Nota: Balanz NO expone volumen ni patrimonio por API para FCI.
+// ───────────────────────────────────────────────────────────────────────────────
+
+function fetchFCIInfo_(ticker) {
+  const t = String(ticker).trim().toUpperCase();
+
+  // 1) Info del fondo
+  const infoJson = balanzGet_(
+    `https://clientes.balanz.com/api/v1/fondos?ticker=${encodeURIComponent(t)}`
+  );
+  const fondos = infoJson.fondos || [];
+  const info = fondos.find(f => f.Ticker === t)
+            || fondos.find(f => t.startsWith(f.Ticker))
+            || fondos[0]
+            || {};
+
+  // 2) Histórico completo
+  const histJson = balanzGet_(
+    `https://clientes.balanz.com/api/v1/historico/eventos?ticker=${encodeURIComponent(t)}&plazo=1&fullNormalize=false`
+  );
+  const hist = histJson.historico || [];
+  if (hist.length === 0) throw new Error("Sin datos históricos para " + t);
+
+  const ultimo   = hist[hist.length - 1];
+  const anterior = hist.length > 1 ? hist[hist.length - 2] : ultimo;
+  const cp       = parseFloat(ultimo.valorcuotaparte);
+  const cpAnt    = parseFloat(anterior.valorcuotaparte);
+  const cpInicio = parseFloat(hist[0].valorcuotaparte);
+
+  function cpHace(n) {
+    const idx = hist.length - 1 - n;
+    return idx >= 0 ? parseFloat(hist[idx].valorcuotaparte) : null;
+  }
+
+  const anioActual    = new Date(ultimo.fecha).getFullYear();
+  const primerDelAnio = hist.find(r => new Date(r.fecha).getFullYear() === anioActual);
+  const cpYTD         = primerDelAnio ? parseFloat(primerDelAnio.valorcuotaparte) : null;
+
+  function varPct(base) {
+    if (!base || base === 0) return null;
+    return (cp - base) / base;
+  }
+
+  return {
+    ticker:     t,
+    nombre:     info.Descripcion || t,
+    corto:      info.NombreCorto || "",
+    moneda:     info.idMoneda === 2 ? "USD" : "ARS",
+    idFondo:    info.idFondo || "",
+    cuotaparte: cp,
+    fecha:      ultimo.fecha,
+    varDiaria:  varPct(cpAnt),
+    varSemanal: varPct(cpHace(5)),
+    varMes:     varPct(cpHace(21)),
+    var3Meses:  varPct(cpHace(63)),
+    varAnual:   varPct(cpHace(252)),
+    varYTD:     varPct(cpYTD),
+    varInicio:  varPct(cpInicio),
+    hist:       hist,
+  };
+}
+
+/**
+ * Precio de cuotaparte actual del fondo.
+ * @param {string} ticker  Ej: "BCAHA", "BCAHB", "BRT", "BCRF"
+ * @customfunction
+ */
+function BALANZ_FCI_CUOTAPARTE(ticker) { return fetchFCIInfo_(ticker).cuotaparte; }
+
+/**
+ * Variación % del día vs cuotaparte anterior (decimal).
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VARIACION(ticker)   { return fetchFCIInfo_(ticker).varDiaria; }
+
+/**
+ * Variación % semanal (~5 días hábiles) en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_SEMANAL(ticker) { return fetchFCIInfo_(ticker).varSemanal; }
+
+/**
+ * Variación % del último mes (~21 días hábiles) en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_MES(ticker)     { return fetchFCIInfo_(ticker).varMes; }
+
+/**
+ * Variación % últimos 3 meses (~63 días hábiles) en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_3MESES(ticker)  { return fetchFCIInfo_(ticker).var3Meses; }
+
+/**
+ * Variación % últimos 12 meses (~252 días hábiles) en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_ANUAL(ticker)   { return fetchFCIInfo_(ticker).varAnual; }
+
+/**
+ * Variación % año a la fecha (YTD) en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_YTD(ticker)     { return fetchFCIInfo_(ticker).varYTD; }
+
+/**
+ * Variación % desde el primer día registrado del fondo en decimal.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_VAR_INICIO(ticker)  { return fetchFCIInfo_(ticker).varInicio; }
+
+/**
+ * Fecha del último dato disponible.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_FECHA(ticker)       { return fetchFCIInfo_(ticker).fecha; }
+
+/**
+ * Nombre completo del fondo.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_NOMBRE(ticker)      { return fetchFCIInfo_(ticker).nombre; }
+
+/**
+ * Nombre corto o categoría del fondo.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_NOMBRE_CORTO(ticker){ return fetchFCIInfo_(ticker).corto; }
+
+/**
+ * Moneda del fondo (ARS o USD).
+ * @param {string} ticker  Ej: "BCAHA"
+ * @customfunction
+ */
+function BALANZ_FCI_MONEDA(ticker)      { return fetchFCIInfo_(ticker).moneda; }
+
+/**
+ * Campo libre de un FCI.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @param {string} campo   cuotaparte|variacion|vardiaria|varsemanal|varmes|var3meses|varanual|varytd|varinicio|fecha|nombre|corto|moneda
+ * @customfunction
+ */
+function BALANZ_FCI(ticker, campo) {
+  if (!ticker) return "Falta ticker";
+  if (!campo)  return "Falta campo";
+  const d = fetchFCIInfo_(ticker);
+  const c = String(campo).trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  const m = {
+    cuotaparte: d.cuotaparte,
+    variacion:  d.varDiaria,
+    vardiaria:  d.varDiaria,
+    varsemanal: d.varSemanal,
+    varmes:     d.varMes,
+    var3meses:  d.var3Meses,
+    varanual:   d.varAnual,
+    varytd:     d.varYTD,
+    varinicio:  d.varInicio,
+    fecha:      d.fecha,
+    nombre:     d.nombre,
+    corto:      d.corto,
+    moneda:     d.moneda,
+  };
+  return (c in m) ? m[c] : "Campo inválido: " + campo;
+}
+
+/**
+ * Cabecera de columnas para BALANZ_FCI_FILA.
+ * @customfunction
+ */
+function BALANZ_FCI_HEADER() {
+  return [["Ticker","Nombre","Categoría","Moneda","Cuotaparte","Var. Diaria","Var. Semanal","Var. 1 Mes","Var. 3 Meses","Var. 12 Meses","Var. YTD","Var. Inicio","Fecha"]];
+}
+
+/**
+ * Fila completa con todos los datos disponibles de un FCI.
+ * @param {string} ticker  Ej: "BCAHA", "BRT", "BCRF"
+ * @customfunction
+ */
+function BALANZ_FCI_FILA(ticker) {
+  if (!ticker) return [["Falta ticker"]];
+  const d = fetchFCIInfo_(ticker);
+  return [[
+    d.ticker, d.nombre, d.corto, d.moneda, d.cuotaparte,
+    d.varDiaria, d.varSemanal, d.varMes, d.var3Meses,
+    d.varAnual, d.varYTD, d.varInicio, d.fecha,
+  ]];
+}
+
+/**
+ * Histórico de cuotapartes de un FCI entre dos fechas.
+ * @param {string} ticker  Ej: "BCAHA"
+ * @param {string} desde   "YYYY-MM-DD" (opcional)
+ * @param {string} hasta   "YYYY-MM-DD" (opcional)
+ * @customfunction
+ */
+function BALANZ_FCI_HIST(ticker, desde, hasta) {
+  if (!ticker) return [["Falta ticker"]];
+  const d = fetchFCIInfo_(ticker);
+  let rows = d.hist;
+  if (desde || hasta) {
+    const d0 = desde ? new Date(desde) : null;
+    const d1 = hasta ? new Date(hasta) : null;
+    rows = rows.filter(r => { const f = new Date(r.fecha); return (!d0 || f >= d0) && (!d1 || f <= d1); });
+  }
+  if (rows.length === 0) return [["Sin datos para " + ticker]];
+  const out = [["Fecha", "Cuotaparte"]];
+  rows.forEach(r => out.push([r.fecha, parseFloat(r.valorcuotaparte)]));
+  return out;
 }
