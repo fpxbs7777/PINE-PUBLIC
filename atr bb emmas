@@ -1,0 +1,56 @@
+// @version=5
+indicator("Estrategia Integral: EMAs + Bollinger + Triple ATR SL", overlay=true)
+
+// --- CONFIGURACIÓN DE EMAs ---
+ema20  = ta.ema(close, 20)
+ema50  = ta.ema(close, 50)
+ema200 = ta.ema(close, 200)
+
+plot(ema20,  color=color.new(#2962FF, 0), linewidth=1, title="EMA 20 (Corto Plazo)")
+plot(ema50,  color=color.new(#FF6D00, 0), linewidth=1, title="EMA 50 (Medio Plazo)")
+plot(ema200, color=color.new(#4CAF50, 0), linewidth=2, title="EMA 200 (Tendencia)")
+
+// --- CONFIGURACIÓN DE BANDAS DE BOLLINGER ---
+bbLength = input.int(20, "Periodos Bollinger", minval=1)
+bbMult   = input.float(2.0, "Desviación Estándar", step=0.1)
+[bbBase, bbUpper, bbLower] = ta.bb(close, bbLength, bbMult)
+
+plot(bbUpper, color=color.new(color.gray, 50), title="Bollinger Superior")
+plot(bbLower, color=color.new(color.gray, 50), title="Bollinger Inferior")
+fill(plot(bbUpper), plot(bbLower), color=color.new(color.gray, 90), title="Fondo Bollinger")
+
+// --- CONFIGURACIÓN DE TRIPLE STOP LOSS (ATR) ---
+atrLength  = input.int(14, "Periodos ATR", minval=1)
+tradeType  = input.string("Compra", "Dirección Operación", options=["Compra", "Venta"])
+entryPrice = input.float(0.0, "Precio de Entrada (0 = Trailing)", step=0.1)
+
+atrValue = ta.atr(atrLength)
+refPrice = entryPrice == 0.0 ? close : entryPrice
+
+sl1_5 = tradeType == "Compra" ? refPrice - (atrValue * 1.5) : refPrice + (atrValue * 1.5)
+sl2   = tradeType == "Compra" ? refPrice - (atrValue * 2.0) : refPrice + (atrValue * 2.0)
+sl3   = tradeType == "Compra" ? refPrice - (atrValue * 3.0) : refPrice + (atrValue * 3.0)
+
+// Dibujo de líneas de SL
+plot(sl1_5, color=color.new(color.yellow, 0), style=plot.style_linebr, linewidth=1, title="SL 1.5 ATR")
+plot(sl2,   color=color.new(color.orange, 0), style=plot.style_linebr, linewidth=1, title="SL 2.0 ATR")
+plot(sl3,   color=color.new(color.red, 0),    style=plot.style_linebr, linewidth=2, title="SL 3.0 ATR")
+
+// --- TABLA INFORMATIVA ---
+var table infoTable = table.new(position.top_right, 2, 6, bgcolor=color.new(color.black, 70), border_width=1)
+
+if barstate.islast
+    table.cell(infoTable, 0, 0, "Indicador", text_color=color.white)
+    table.cell(infoTable, 1, 0, "Valor/Precio", text_color=color.white)
+    
+    table.cell(infoTable, 0, 1, "ATR (Vola)", text_color=color.white)
+    table.cell(infoTable, 1, 1, str.tostring(atrValue, "#.##"), text_color=color.yellow)
+    
+    table.cell(infoTable, 0, 2, "SL 1.5 (Agress)", text_color=color.yellow)
+    table.cell(infoTable, 1, 2, str.tostring(sl1_5, "#.##"), text_color=color.yellow)
+    
+    table.cell(infoTable, 0, 3, "SL 2.0 (Normal)", text_color=color.orange)
+    table.cell(infoTable, 1, 3, str.tostring(sl2, "#.##"), text_color=color.orange)
+    
+    table.cell(infoTable, 0, 4, "SL 3.0 (Trend)", text_color=color.red)
+    table.cell(infoTable, 1, 4, str.tostring(sl3, "#.##"), text_color=color.red)
