@@ -1,0 +1,1268 @@
+{
+  "Technology": {
+    "Semiconductors": [
+      {
+        "ticker": "MU",
+        "nombre": "Micron Technology, Inc."
+      },
+      {
+        "ticker": "NVDA",
+        "nombre": "NVIDIA Corporation"
+      },
+      {
+        "ticker": "INTC",
+        "nombre": "Intel Corporation"
+      },
+      {
+        "ticker": "AMD",
+        "nombre": "Advanced Micro Devices, Inc."
+      },
+      {
+        "ticker": "AVGO",
+        "nombre": "Broadcom Inc."
+      },
+      {
+        "ticker": "QCOM",
+        "nombre": "QUALCOMM Incorporated"
+      },
+      {
+        "ticker": "TSM",
+        "nombre": "Taiwan Semiconductor Manufacturing Company Limited"
+      },
+      {
+        "ticker": "ARM",
+        "nombre": "Arm Holdings plc"
+      },
+      {
+        "ticker": "MRVL",
+        "nombre": "Marvell Technology, Inc."
+      },
+      {
+        "ticker": "ALAB",
+        "nombre": "Astera Labs, Inc."
+      },
+      {
+        "ticker": "TXN",
+        "nombre": "Texas Instruments Incorporated"
+      },
+      {
+        "ticker": "SWKS",
+        "nombre": "Skyworks Solutions, Inc."
+      },
+      {
+        "ticker": "ADI",
+        "nombre": "Analog Devices, Inc."
+      }
+    ],
+    "Software - Infrastructure": [
+      {
+        "ticker": "MSFT",
+        "nombre": "Microsoft Corporation"
+      },
+      {
+        "ticker": "ORCL",
+        "nombre": "Oracle Corporation"
+      },
+      {
+        "ticker": "PLTR",
+        "nombre": "Palantir Technologies Inc."
+      },
+      {
+        "ticker": "CRWV",
+        "nombre": "CoreWeave, Inc."
+      },
+      {
+        "ticker": "PATH",
+        "nombre": "UiPath, Inc."
+      },
+      {
+        "ticker": "AI",
+        "nombre": "C3.ai, Inc."
+      },
+      {
+        "ticker": "PAGS",
+        "nombre": "PagSeguro Digital Ltd."
+      },
+      {
+        "ticker": "STNE",
+        "nombre": "StoneCo Ltd."
+      },
+      {
+        "ticker": "PANW",
+        "nombre": "Palo Alto Networks, Inc."
+      },
+      {
+        "ticker": "BB",
+        "nombre": "BlackBerry Limited"
+      },
+      {
+        "ticker": "XYZ",
+        "nombre": "Block, Inc."
+      },
+      {
+        "ticker": "TWLO",
+        "nombre": "Twilio Inc."
+      },
+      {
+        "ticker": "VRSN",
+        "nombre": "VeriSign, Inc."
+      }
+    ],
+    "Information Technology Services": [
+      {
+        "ticker": "IBM",
+        "nombre": "International Business Machines Corporation"
+      },
+      {
+        "ticker": "GLOB",
+        "nombre": "Globant S.A."
+      },
+      {
+        "ticker": "KEEL",
+        "nombre": "Keel Infrastructure Corp."
+      },
+      {
+        "ticker": "ACN",
+        "nombre": "Accenture plc"
+      },
+      {
+        "ticker": "INFY",
+        "nombre": "Infosys Limited"
+      }
+    ],
+    "Computer Hardware": [
+      {
+        "ticker": "RGTI",
+        "nombre": "Rigetti Computing, Inc."
+      },
+      {
+        "ticker": "HPQ",
+        "nombre": "HP Inc."
+      }
+    ],
+    "Software - Application": [
+      {
+        "ticker": "MSTR",
+        "nombre": "Strategy Inc"
+      },
+      {
+        "ticker": "CRM",
+        "nombre": "Salesforce, Inc."
+      },
+      {
+        "ticker": "ADBE",
+        "nombre": "Adobe Inc."
+      },
+      {
+        "ticker": "UBER",
+        "nombre": "Uber Technologies, Inc."
+      },
+      {
+        "ticker": "SNOW",
+        "nombre": "Snowflake Inc."
+      },
+      {
+        "ticker": "SAP",
+        "nombre": "SAP SE"
+      },
+      {
+        "ticker": "TEAM",
+        "nombre": "Atlassian Corporation"
+      },
+      {
+        "ticker": "DOCU",
+        "nombre": "DocuSign, Inc."
+      },
+      {
+        "ticker": "SHOP",
+        "nombre": "Shopify Inc."
+      },
+      {
+        "ticker": "ZM",
+        "nombre": "Zoom Communications, Inc."
+      },
+      {
+        "ticker": "ADP",
+        "nombre": "Automatic Data Processing, Inc."
+      }
+    ],
+    "Consumer Electronics": [
+      {
+        "ticker": "AAPL",
+        "nombre": "Apple Inc."
+      },
+      {
+        "ticker": "SONY",
+        "nombre": "Sony Group Corporation"
+      }
+    ],
+    "Communication Equipment": [
+      {
+        "ticker": "ASTS",
+        "nombre": "AST SpaceMobile, Inc."
+      },
+      {
+        "ticker": "CSCO",
+        "nombre": "Cisco Systems, Inc."
+      },
+      {
+        "ticker": "MSI",
+        "nombre": "Motorola Solutions, Inc."
+      },
+      {
+        "ticker": "ERIC",
+        "nombre": "Telefonaktiebolaget LM Ericsson (publ)"
+      }
+    ],
+    "Semiconductor Equipment & Materials": [
+      {
+        "ticker": "ASML",
+        "nombre": "ASML Holding N.V."
+      },
+      {
+        "ticker": "AMAT",
+        "nombre": "Applied Materials, Inc."
+      },
+      {
+        "ticker": "LRCX",
+        "nombre": "Lam Research Corporation"
+      }
+    ],
+    "Solar": [
+      {
+        "ticker": "FSLR",
+        "nombre": "First Solar, Inc."
+      }
+    ],
+    "Electronic Components": [
+      {
+        "ticker": "GLW",
+        "nombre": "Corning Incorporated"
+      }
+    ]
+  },
+  "Communication Services": {
+    "Internet Content & Information": [
+      {
+        "ticker": "META",
+        "nombre": "Meta Platforms, Inc."
+      },
+      {
+        "ticker": "GOOGL",
+        "nombre": "Alphabet Inc."
+      },
+      {
+        "ticker": "SPOT",
+        "nombre": "Spotify Technology S.A."
+      },
+      {
+        "ticker": "BIDU",
+        "nombre": "Baidu, Inc."
+      },
+      {
+        "ticker": "PINS",
+        "nombre": "Pinterest, Inc."
+      },
+      {
+        "ticker": "YELP",
+        "nombre": "Yelp Inc."
+      },
+      {
+        "ticker": "SNAP",
+        "nombre": "Snap Inc."
+      },
+      {
+        "ticker": "JOYY",
+        "nombre": "JOYY Inc."
+      }
+    ],
+    "Entertainment": [
+      {
+        "ticker": "NFLX",
+        "nombre": "Netflix, Inc."
+      },
+      {
+        "ticker": "ROKU",
+        "nombre": "Roku, Inc."
+      }
+    ],
+    "Electronic Gaming & Multimedia": [
+      {
+        "ticker": "RBLX",
+        "nombre": "Roblox Corporation"
+      },
+      {
+        "ticker": "EA",
+        "nombre": "Electronic Arts Inc."
+      }
+    ],
+    "Telecom Services": [
+      {
+        "ticker": "VZ",
+        "nombre": "Verizon Communications Inc."
+      },
+      {
+        "ticker": "T",
+        "nombre": "AT&T Inc."
+      },
+      {
+        "ticker": "TMUS",
+        "nombre": "T-Mobile US, Inc."
+      }
+    ]
+  },
+  "No disponible": {
+    "No disponible": [
+      {
+        "ticker": "SPY",
+        "nombre": "State Street SPDR S&P 500 ETF Trust"
+      },
+      {
+        "ticker": "IBIT",
+        "nombre": "iShares Bitcoin Trust ETF"
+      },
+      {
+        "ticker": "QQQ",
+        "nombre": "Invesco QQQ Trust"
+      },
+      {
+        "ticker": "EWZ",
+        "nombre": "iShares MSCI Brazil ETF"
+      },
+      {
+        "ticker": "NOKA",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "GLD",
+        "nombre": "SPDR Gold Shares"
+      },
+      {
+        "ticker": "SLV",
+        "nombre": "iShares Silver Trust"
+      },
+      {
+        "ticker": "BRKB",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "ETHA",
+        "nombre": "iShares Ethereum Trust ETF"
+      },
+      {
+        "ticker": "SMH",
+        "nombre": "VanEck Semiconductor ETF"
+      },
+      {
+        "ticker": "XLE",
+        "nombre": "State Street Energy Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "COPX",
+        "nombre": "Global X Copper Miners ETF"
+      },
+      {
+        "ticker": "URA",
+        "nombre": "Global X Uranium ETF"
+      },
+      {
+        "ticker": "EEM",
+        "nombre": "iShares MSCI Emerging Markets ETF"
+      },
+      {
+        "ticker": "DIA",
+        "nombre": "State Street SPDR Dow Jones Industrial Average ETF Trust"
+      },
+      {
+        "ticker": "FXI",
+        "nombre": "iShares China Large-Cap ETF"
+      },
+      {
+        "ticker": "XLV",
+        "nombre": "State Street Health Care Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "XLP",
+        "nombre": "State Street Consumer Staples Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "XLF",
+        "nombre": "State Street Financial Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "SPXL",
+        "nombre": "Direxion Daily S&P500 Bull 3X Shares"
+      },
+      {
+        "ticker": "XLU",
+        "nombre": "State Street Utilities Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "XROX",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "VEA",
+        "nombre": "Vanguard FTSE Developed Markets Index Fund ETF Shares"
+      },
+      {
+        "ticker": "IWM",
+        "nombre": "iShares Russell 2000 ETF"
+      },
+      {
+        "ticker": "TQQQ",
+        "nombre": "ProShares UltraPro QQQ"
+      },
+      {
+        "ticker": "ADGO",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "ACWI",
+        "nombre": "iShares MSCI ACWI ETF"
+      },
+      {
+        "ticker": "DISN",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "VXX",
+        "nombre": "iPath Series B S&P 500 VIX Short-Term Futures ETN"
+      },
+      {
+        "ticker": "TXR",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "VIG",
+        "nombre": "Vanguard Dividend Appreciation Index Fund ETF Shares"
+      },
+      {
+        "ticker": "IEUR",
+        "nombre": "iShares Core MSCI Europe ETF"
+      },
+      {
+        "ticker": "ARKK",
+        "nombre": "ARK Innovation ETF"
+      },
+      {
+        "ticker": "BA.C",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "PSQ",
+        "nombre": "ProShares Short QQQ"
+      },
+      {
+        "ticker": "IVW",
+        "nombre": "iShares S&P 500 Growth ETF"
+      },
+      {
+        "ticker": "IVE",
+        "nombre": "iShares S&P 500 Value ETF"
+      },
+      {
+        "ticker": "SH",
+        "nombre": "ProShares Short S&P500"
+      },
+      {
+        "ticker": "BNG",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "MGLU3",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "XLRE",
+        "nombre": "State Street Real Estate Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "EWJ",
+        "nombre": "iShares MSCI Japan ETF"
+      },
+      {
+        "ticker": "BBV",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "PETR3",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "XLB",
+        "nombre": "State Street Materials Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "XLC",
+        "nombre": "State Street Communication Services Select Sector SPDR ETF"
+      },
+      {
+        "ticker": "PRIO3",
+        "nombre": "Nombre no encontrado"
+      }
+    ]
+  },
+  "Consumer Cyclical": {
+    "Internet Retail": [
+      {
+        "ticker": "MELI",
+        "nombre": "MercadoLibre, Inc."
+      },
+      {
+        "ticker": "AMZN",
+        "nombre": "Amazon.com, Inc."
+      },
+      {
+        "ticker": "JD",
+        "nombre": "JD.com, Inc."
+      },
+      {
+        "ticker": "BABA",
+        "nombre": "Alibaba Group Holding Limited"
+      },
+      {
+        "ticker": "JMIA",
+        "nombre": "Jumia Technologies AG"
+      },
+      {
+        "ticker": "SE",
+        "nombre": "Sea Limited"
+      },
+      {
+        "ticker": "PDD",
+        "nombre": "PDD Holdings Inc."
+      },
+      {
+        "ticker": "EBAY",
+        "nombre": "eBay Inc."
+      },
+      {
+        "ticker": "ETSY",
+        "nombre": "Etsy, Inc."
+      }
+    ],
+    "Auto Manufacturers": [
+      {
+        "ticker": "TSLA",
+        "nombre": "Tesla, Inc."
+      },
+      {
+        "ticker": "NIO",
+        "nombre": "NIO Inc."
+      },
+      {
+        "ticker": "F",
+        "nombre": "Ford Motor Company"
+      },
+      {
+        "ticker": "TM",
+        "nombre": "Toyota Motor Corporation"
+      },
+      {
+        "ticker": "RACE",
+        "nombre": "Ferrari N.V."
+      },
+      {
+        "ticker": "STLA",
+        "nombre": "Stellantis N.V."
+      },
+      {
+        "ticker": "GM",
+        "nombre": "General Motors Company"
+      },
+      {
+        "ticker": "HMC",
+        "nombre": "Honda Motor Co., Ltd."
+      }
+    ],
+    "Restaurants": [
+      {
+        "ticker": "MCD",
+        "nombre": "McDonald's Corporation"
+      },
+      {
+        "ticker": "ARCO",
+        "nombre": "Arcos Dorados Holdings Inc."
+      },
+      {
+        "ticker": "SBUX",
+        "nombre": "Starbucks Corporation"
+      }
+    ],
+    "Footwear & Accessories": [
+      {
+        "ticker": "NKE",
+        "nombre": "NIKE, Inc."
+      }
+    ],
+    "Resorts & Casinos": [
+      {
+        "ticker": "LVS",
+        "nombre": "Las Vegas Sands Corp."
+      }
+    ],
+    "Auto & Truck Dealerships": [
+      {
+        "ticker": "SDA",
+        "nombre": "SunCar Technology Group Inc."
+      }
+    ],
+    "Apparel Retail": [
+      {
+        "ticker": "ANF",
+        "nombre": "Abercrombie & Fitch Co."
+      },
+      {
+        "ticker": "URBN",
+        "nombre": "Urban Outfitters, Inc."
+      }
+    ],
+    "Travel Services": [
+      {
+        "ticker": "TCOM",
+        "nombre": "Trip.com Group Limited"
+      },
+      {
+        "ticker": "ABNB",
+        "nombre": "Airbnb, Inc."
+      },
+      {
+        "ticker": "BKNG",
+        "nombre": "Booking Holdings Inc."
+      },
+      {
+        "ticker": "TRIP",
+        "nombre": "Tripadvisor, Inc."
+      },
+      {
+        "ticker": "CCL",
+        "nombre": "Carnival Corporation Ltd."
+      }
+    ],
+    "Home Improvement Retail": [
+      {
+        "ticker": "HD",
+        "nombre": "The Home Depot, Inc."
+      }
+    ],
+    "Recreational Vehicles": [
+      {
+        "ticker": "HOG",
+        "nombre": "Harley-Davidson, Inc."
+      }
+    ],
+    "Auto Parts": [
+      {
+        "ticker": "AAP",
+        "nombre": "Advance Auto Parts, Inc."
+      },
+      {
+        "ticker": "ORLY",
+        "nombre": "O'Reilly Automotive, Inc."
+      },
+      {
+        "ticker": "GT",
+        "nombre": "The Goodyear Tire & Rubber Company"
+      }
+    ],
+    "Packaging & Containers": [
+      {
+        "ticker": "AVY",
+        "nombre": "Avery Dennison Corporation"
+      }
+    ]
+  },
+  "Energy": {
+    "Oil & Gas E&P": [
+      {
+        "ticker": "VIST",
+        "nombre": "Vista Energy, S.A.B. de C.V."
+      },
+      {
+        "ticker": "GPRK",
+        "nombre": "GeoPark Limited"
+      },
+      {
+        "ticker": "OXY",
+        "nombre": "Occidental Petroleum Corporation"
+      }
+    ],
+    "Oil & Gas Integrated": [
+      {
+        "ticker": "PBR",
+        "nombre": "Petróleo Brasileiro S.A. - Petrobras"
+      },
+      {
+        "ticker": "CVX",
+        "nombre": "Chevron Corporation"
+      },
+      {
+        "ticker": "XOM",
+        "nombre": "Exxon Mobil Corporation"
+      },
+      {
+        "ticker": "BP",
+        "nombre": "BP p.l.c."
+      },
+      {
+        "ticker": "SHEL",
+        "nombre": "Shell plc"
+      },
+      {
+        "ticker": "EQNR",
+        "nombre": "Equinor ASA"
+      }
+    ],
+    "Oil & Gas Midstream": [
+      {
+        "ticker": "TEN",
+        "nombre": "Tsakos Energy Navigation Limited"
+      }
+    ],
+    "Oil & Gas Equipment & Services": [
+      {
+        "ticker": "HAL",
+        "nombre": "Halliburton Company"
+      },
+      {
+        "ticker": "SLB",
+        "nombre": "SLB N.V."
+      }
+    ],
+    "Uranium": [
+      {
+        "ticker": "NXE",
+        "nombre": "NexGen Energy Ltd."
+      }
+    ]
+  },
+  "Financial Services": {
+    "Banks - Regional": [
+      {
+        "ticker": "NU",
+        "nombre": "Nu Holdings Ltd."
+      },
+      {
+        "ticker": "BBD",
+        "nombre": "Banco Bradesco S.A."
+      },
+      {
+        "ticker": "ITUB",
+        "nombre": "Itaú Unibanco Holding S.A."
+      },
+      {
+        "ticker": "BSBR",
+        "nombre": "Banco Santander (Brasil) S.A."
+      },
+      {
+        "ticker": "HDB",
+        "nombre": "HDFC Bank Limited"
+      }
+    ],
+    "Capital Markets": [
+      {
+        "ticker": "HUT",
+        "nombre": "Hut 8 Corp."
+      },
+      {
+        "ticker": "RIOT",
+        "nombre": "Riot Platforms, Inc."
+      },
+      {
+        "ticker": "IREN",
+        "nombre": "IREN Limited"
+      },
+      {
+        "ticker": "HOOD",
+        "nombre": "Robinhood Markets, Inc."
+      },
+      {
+        "ticker": "XP",
+        "nombre": "XP Inc."
+      },
+      {
+        "ticker": "GS",
+        "nombre": "The Goldman Sachs Group, Inc."
+      }
+    ],
+    "Financial Data & Stock Exchanges": [
+      {
+        "ticker": "COIN",
+        "nombre": "Coinbase Global, Inc."
+      },
+      {
+        "ticker": "SPGI",
+        "nombre": "S&P Global Inc."
+      }
+    ],
+    "Credit Services": [
+      {
+        "ticker": "V",
+        "nombre": "Visa Inc."
+      },
+      {
+        "ticker": "UPST",
+        "nombre": "Upstart Holdings, Inc."
+      },
+      {
+        "ticker": "MA",
+        "nombre": "Mastercard Incorporated"
+      },
+      {
+        "ticker": "AXP",
+        "nombre": "American Express Company"
+      },
+      {
+        "ticker": "PYPL",
+        "nombre": "PayPal Holdings, Inc."
+      }
+    ],
+    "Banks - Diversified": [
+      {
+        "ticker": "JPM",
+        "nombre": "JPMorgan Chase & Co."
+      },
+      {
+        "ticker": "C",
+        "nombre": "Citigroup Inc."
+      },
+      {
+        "ticker": "SAN",
+        "nombre": "Banco Santander, S.A."
+      },
+      {
+        "ticker": "WFC",
+        "nombre": "Wells Fargo & Company"
+      },
+      {
+        "ticker": "HSBC",
+        "nombre": "HSBC Holdings plc"
+      },
+      {
+        "ticker": "BNY",
+        "nombre": "Nombre no encontrado"
+      }
+    ],
+    "Insurance - Diversified": [
+      {
+        "ticker": "AIG",
+        "nombre": "American International Group, Inc."
+      }
+    ],
+    "Insurance Brokers": [
+      {
+        "ticker": "MRSH",
+        "nombre": "Marsh & McLennan Companies, Inc."
+      }
+    ]
+  },
+  "Industrials": {
+    "Aerospace & Defense": [
+      {
+        "ticker": "SATL",
+        "nombre": "Satellogic Inc."
+      },
+      {
+        "ticker": "SPCE",
+        "nombre": "Virgin Galactic Holdings, Inc."
+      },
+      {
+        "ticker": "RKLB",
+        "nombre": "Rocket Lab Corporation"
+      },
+      {
+        "ticker": "EMBJ",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "LMT",
+        "nombre": "Lockheed Martin Corporation"
+      },
+      {
+        "ticker": "BA",
+        "nombre": "The Boeing Company"
+      },
+      {
+        "ticker": "GE",
+        "nombre": "GE Aerospace"
+      },
+      {
+        "ticker": "RTX",
+        "nombre": "RTX Corporation"
+      },
+      {
+        "ticker": "HWM",
+        "nombre": "Howmet Aerospace Inc."
+      }
+    ],
+    "Farm & Heavy Construction Machinery": [
+      {
+        "ticker": "CAT",
+        "nombre": "Caterpillar Inc."
+      },
+      {
+        "ticker": "DE",
+        "nombre": "Deere & Company"
+      }
+    ],
+    "Airlines": [
+      {
+        "ticker": "AAL",
+        "nombre": "American Airlines Group Inc."
+      },
+      {
+        "ticker": "UAL",
+        "nombre": "United Airlines Holdings, Inc."
+      },
+      {
+        "ticker": "DAL",
+        "nombre": "Delta Air Lines, Inc."
+      }
+    ],
+    "Conglomerates": [
+      {
+        "ticker": "HON",
+        "nombre": "Honeywell International Inc."
+      },
+      {
+        "ticker": "MMM",
+        "nombre": "3M Company"
+      }
+    ],
+    "Rental & Leasing Services": [
+      {
+        "ticker": "CAR",
+        "nombre": "Avis Budget Group, Inc."
+      }
+    ],
+    "Integrated Freight & Logistics": [
+      {
+        "ticker": "FDX",
+        "nombre": "FedEx Corporation"
+      }
+    ],
+    "Airports & Air Services": [
+      {
+        "ticker": "CAAP",
+        "nombre": "Corporación América Airports S.A."
+      }
+    ]
+  },
+  "Consumer Defensive": {
+    "Beverages - Non-Alcoholic": [
+      {
+        "ticker": "KO",
+        "nombre": "The Coca-Cola Company"
+      },
+      {
+        "ticker": "PEP",
+        "nombre": "PepsiCo, Inc."
+      }
+    ],
+    "Discount Stores": [
+      {
+        "ticker": "WMT",
+        "nombre": "Walmart Inc."
+      },
+      {
+        "ticker": "COST",
+        "nombre": "Costco Wholesale Corporation"
+      },
+      {
+        "ticker": "TGT",
+        "nombre": "Target Corporation"
+      }
+    ],
+    "Household & Personal Products": [
+      {
+        "ticker": "PG",
+        "nombre": "The Procter & Gamble Company"
+      },
+      {
+        "ticker": "UL",
+        "nombre": "Unilever PLC"
+      },
+      {
+        "ticker": "KMB",
+        "nombre": "Kimberly-Clark Corporation"
+      },
+      {
+        "ticker": "CL",
+        "nombre": "Colgate-Palmolive Company"
+      }
+    ],
+    "Tobacco": [
+      {
+        "ticker": "MO",
+        "nombre": "Altria Group, Inc."
+      },
+      {
+        "ticker": "PM",
+        "nombre": "Philip Morris International Inc."
+      }
+    ],
+    "Confectioners": [
+      {
+        "ticker": "HSY",
+        "nombre": "The Hershey Company"
+      },
+      {
+        "ticker": "MDLZ",
+        "nombre": "Mondelez International, Inc."
+      }
+    ],
+    "Beverages - Wineries & Distilleries": [
+      {
+        "ticker": "DEO",
+        "nombre": "Diageo plc"
+      }
+    ],
+    "Beverages - Brewers": [
+      {
+        "ticker": "ABEV",
+        "nombre": "Ambev S.A."
+      }
+    ]
+  },
+  "Utilities": {
+    "Utilities - Independent Power Producers": [
+      {
+        "ticker": "OKLO",
+        "nombre": "Oklo Inc."
+      },
+      {
+        "ticker": "CEG",
+        "nombre": "Constellation Energy Corporation"
+      },
+      {
+        "ticker": "VST",
+        "nombre": "Vistra Corp."
+      }
+    ],
+    "Utilities - Regulated Electric": [
+      {
+        "ticker": "NGG",
+        "nombre": "National Grid plc"
+      }
+    ]
+  },
+  "Basic Materials": {
+    "Other Industrial Metals & Mining": [
+      {
+        "ticker": "LAC",
+        "nombre": "Lithium Americas Corp."
+      },
+      {
+        "ticker": "LAR",
+        "nombre": "Lithium Argentina AG"
+      },
+      {
+        "ticker": "VALE",
+        "nombre": "Vale S.A."
+      },
+      {
+        "ticker": "RIO",
+        "nombre": "Rio Tinto Group"
+      },
+      {
+        "ticker": "BHP",
+        "nombre": "BHP Group Limited"
+      }
+    ],
+    "Gold": [
+      {
+        "ticker": "HMY",
+        "nombre": "Harmony Gold Mining Company Limited"
+      },
+      {
+        "ticker": "B",
+        "nombre": "Nombre no encontrado"
+      },
+      {
+        "ticker": "PAAS",
+        "nombre": "Pan American Silver Corp."
+      },
+      {
+        "ticker": "NEM",
+        "nombre": "Newmont Corporation"
+      },
+      {
+        "ticker": "CDE",
+        "nombre": "Coeur Mining, Inc."
+      },
+      {
+        "ticker": "GFI",
+        "nombre": "Gold Fields Limited"
+      },
+      {
+        "ticker": "AEM",
+        "nombre": "Agnico Eagle Mines Limited"
+      },
+      {
+        "ticker": "KGC",
+        "nombre": "Kinross Gold Corporation"
+      },
+      {
+        "ticker": "NG",
+        "nombre": "NovaGold Resources Inc."
+      }
+    ],
+    "Agricultural Inputs": [
+      {
+        "ticker": "BIOX",
+        "nombre": "Bioceres Crop Solutions Corp."
+      },
+      {
+        "ticker": "MOS",
+        "nombre": "The Mosaic Company"
+      }
+    ],
+    "Other Precious Metals & Mining": [
+      {
+        "ticker": "HL",
+        "nombre": "Hecla Mining Company"
+      },
+      {
+        "ticker": "MUX",
+        "nombre": "McEwen Inc."
+      }
+    ],
+    "Copper": [
+      {
+        "ticker": "SCCO",
+        "nombre": "Southern Copper Corporation"
+      },
+      {
+        "ticker": "FCX",
+        "nombre": "Freeport-McMoRan Inc."
+      }
+    ],
+    "Steel": [
+      {
+        "ticker": "SID",
+        "nombre": "Companhia Siderúrgica Nacional"
+      },
+      {
+        "ticker": "GGB",
+        "nombre": "Gerdau S.A."
+      },
+      {
+        "ticker": "NUE",
+        "nombre": "Nucor Corporation"
+      }
+    ],
+    "Chemicals": [
+      {
+        "ticker": "BAK",
+        "nombre": "Braskem S.A."
+      },
+      {
+        "ticker": "DOW",
+        "nombre": "Dow Inc."
+      }
+    ],
+    "Building Materials": [
+      {
+        "ticker": "CX",
+        "nombre": "CEMEX, S.A.B. de C.V."
+      }
+    ],
+    "Specialty Chemicals": [
+      {
+        "ticker": "DD",
+        "nombre": "DuPont de Nemours, Inc."
+      }
+    ]
+  },
+  "Healthcare": {
+    "Drug Manufacturers - General": [
+      {
+        "ticker": "PFE",
+        "nombre": "Pfizer Inc."
+      },
+      {
+        "ticker": "LLY",
+        "nombre": "Eli Lilly and Company"
+      },
+      {
+        "ticker": "JNJ",
+        "nombre": "Johnson & Johnson"
+      },
+      {
+        "ticker": "BMY",
+        "nombre": "Bristol-Myers Squibb Company"
+      },
+      {
+        "ticker": "AMGN",
+        "nombre": "Amgen Inc."
+      },
+      {
+        "ticker": "GILD",
+        "nombre": "Gilead Sciences, Inc."
+      },
+      {
+        "ticker": "MRK",
+        "nombre": "Merck & Co., Inc."
+      },
+      {
+        "ticker": "ABBV",
+        "nombre": "AbbVie Inc."
+      },
+      {
+        "ticker": "NVS",
+        "nombre": "Novartis AG"
+      },
+      {
+        "ticker": "BIIB",
+        "nombre": "Biogen Inc."
+      },
+      {
+        "ticker": "AZN",
+        "nombre": "AstraZeneca PLC"
+      },
+      {
+        "ticker": "GSK",
+        "nombre": "GSK plc"
+      }
+    ],
+    "Healthcare Plans": [
+      {
+        "ticker": "UNH",
+        "nombre": "UnitedHealth Group Incorporated"
+      },
+      {
+        "ticker": "CVS",
+        "nombre": "CVS Health Corporation"
+      }
+    ],
+    "Medical Instruments & Supplies": [
+      {
+        "ticker": "ISRG",
+        "nombre": "Intuitive Surgical, Inc."
+      }
+    ],
+    "Biotechnology": [
+      {
+        "ticker": "MRNA",
+        "nombre": "Moderna, Inc."
+      }
+    ],
+    "Medical Devices": [
+      {
+        "ticker": "ABT",
+        "nombre": "Abbott Laboratories"
+      },
+      {
+        "ticker": "MDT",
+        "nombre": "Medtronic plc"
+      }
+    ],
+    "Diagnostics & Research": [
+      {
+        "ticker": "TMO",
+        "nombre": "Thermo Fisher Scientific Inc."
+      }
+    ]
+  }
+}
