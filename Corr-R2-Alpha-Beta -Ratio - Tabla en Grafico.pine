@@ -1,0 +1,206 @@
+//@version=6
+indicator("Corr/R²/Alpha/Beta - Tabla en Gráfico", shorttitle="Corr Tabla", overlay=true)
+
+// ============================================================
+// ESTE SCRIPT VA SUPERPUESTO SOBRE EL GRÁFICO DE PRECIO (overlay=true).
+// No dibuja líneas: solo la tabla de estadísticas.
+//
+// CAMBIO CLAVE (v7) respecto a la versión anterior:
+// El script viejo usaba chart.left_visible_bar_time para definir
+// la ventana ("len" = barras visibles en pantalla). Esa variable
+// obliga a Pine a recalcular TODO el historial desde la barra 0
+// cada vez que se hace scroll o zoom - es una limitación del motor
+// de TradingView, no del código. Por eso tardaba al moverse.
+//
+// Ahora la ventana es un número FIJO de barras (input "lenBars"),
+// desacoplado del rango visible. Con eso, TradingView cachea el
+// historial como con cualquier indicador nativo: al mover o hacer
+// zoom NO se recalcula nada, solo se redibuja lo ya calculado.
+// El cálculo solo corre cuando llega una barra/tick nuevo, y ahí
+// usa las series históricas ya calculadas (ta.* nativo de Pine
+// hace esto internamente en O(1) por barra) + el valor nuevo -
+// nunca vuelve a procesar todo el período.
+// ============================================================
+
+// === INPUTS ===
+symB       = input.symbol(defval="ASX:GXS", title="Segundo activo (símbolo comparado)")
+srcA       = input.source(close, title="Fuente activo principal (gráfico actual)")
+lenBars    = input.int(300, title="Barras de la ventana de cálculo", minval=10, maxval=4999,
+     tooltip="Cantidad fija de barras hacia atrás para correlación/beta/alpha/ratio. Al ser fija (no atada al rango visible), mover o hacer zoom en el gráfico es instantáneo: no recalcula el historial.")
+tablePosStr = input.string("Arriba Centro", title="Posición de la tabla",
+     options=["Arriba Centro", "Arriba Izquierda", "Arriba Derecha", "Abajo Centro", "Abajo Izquierda", "Abajo Derecha"])
+sizeStr = input.string("Grande", title="Tamaño de texto de la tabla",
+     options=["Pequeño", "Normal", "Grande", "Muy Grande"])
+liveUpdate = input.bool(false, title="Actualizar en cada tick (tiempo real)",
+     tooltip="Desactivado (recomendado): la tabla solo se actualiza al cerrar cada barra, evita parpadeos y recálculos constantes al mover el precio intrabar. Activado: se actualiza con cada tick.")
+showCompare = input.bool(false, title="Mostrar comparación corto/largo plazo (2da ventana)", group="Visualización",
+     tooltip="Agrega dos columnas a la tabla con la correlación calculada sobre una segunda ventana (más larga), para comparar de un vistazo el régimen de corto plazo vs el estructural.")
+lenBars2 = input.int(200, title="Barras ventana larga (comparación)", minval=10, maxval=4999, group="Visualización")
+
+tablePos = tablePosStr == "Arriba Centro"    ? position.top_center :
+           tablePosStr == "Arriba Izquierda" ? position.top_left :
+           tablePosStr == "Arriba Derecha"   ? position.top_right :
+           tablePosStr == "Abajo Centro"     ? position.bottom_center :
+           tablePosStr == "Abajo Izquierda"  ? position.bottom_left : position.bottom_right
+
+// El tamaño de etiqueta queda siempre un escalón por debajo del de valor, para mantener jerarquía visual
+valueSize = sizeStr == "Pequeño" ? size.small : sizeStr == "Normal" ? size.normal : sizeStr == "Grande" ? size.large : size.huge
+labelSize = sizeStr == "Pequeño" ? size.tiny  : sizeStr == "Normal" ? size.small  : sizeStr == "Grande" ? size.normal : size.large
+
+// === DATOS ===
+closeA = srcA
+closeB = request.security(symB, timeframe.period, close, lookahead=barmerge.lookahead_off)
+
+// === VENTANA FIJA (ya no depende del rango visible en pantalla) ===
+len = lenBars
+
+// === CORRELACIÓN Y R² SOBRE LA VENTANA FIJA ===
+corr = ta.correlation(closeA, closeB, len)
+r2   = math.pow(corr, 2)
+
+// === SEGUNDA VENTANA (COMPARACIÓN CORTO/LARGO PLAZO) ===
+// Se calcula solo si showCompare está activo: ta.correlation con largo fijo
+// es igual de liviano que ta.rsi, así que no afecta la velocidad de scroll.
+corr2 = showCompare ? ta.correlation(closeA, closeB, lenBars2) : na
+r2_2  = showCompare ? math.pow(corr2, 2) : na
+
+// === RETORNOS PARA ALPHA / BETA ===
+retA = ta.roc(closeA, 1)   // % de cambio por barra
+retB = ta.roc(closeB, 1)
+
+// ta.covariance no existe como función nativa en Pine; se calcula a mano:
+// cov(A,B) = media(A*B) - media(A)*media(B)
+meanA = ta.sma(retA, len)
+meanB = ta.sma(retB, len)
+meanAB = ta.sma(retA * retB, len)
+covAB = meanAB - meanA * meanB
+varB  = ta.variance(retB, len)
+beta  = varB != 0 ? covAB / varB : na
+alpha = na(beta) ? na : meanA - beta * meanB   // % por barra, NO anualizado
+
+// === ESTADÍSTICAS HISTÓRICAS DE CORRELACIÓN (acumuladas desde que corre el script en el gráfico) ===
+var float sumCorr = 0.0
+var int   nBars   = 0
+var float maxCorr = na
+var float minCorr = na
+
+if not na(corr)
+    sumCorr += corr
+    nBars   += 1
+    maxCorr := na(maxCorr) ? corr : math.max(maxCorr, corr)
+    minCorr := na(minCorr) ? corr : math.min(minCorr, corr)
+
+avgCorrHist = nBars > 0 ? sumCorr / nBars : na
+
+// === RATIO ENTRE LOS DOS ACTIVOS ===
+ratio        = closeA / closeB
+ratioMean    = ta.sma(ratio, len)
+ratioStdDev  = ta.stdev(ratio, len)
+ratioPctRank = ta.percentrank(ratio, len)          // percentil histórico (0-100) del ratio actual dentro de la ventana
+zScore       = ratioStdDev != 0 ? (ratio - ratioMean) / ratioStdDev : na
+
+zZoneLabel = na(zScore) ? "N/D" :
+     math.abs(zScore) <= 1 ? "Dentro de ±1σ (zona normal)" :
+     math.abs(zScore) <= 2 ? (zScore > 0 ? "Entre +1σ y +2σ (desvío alto)" : "Entre -1σ y -2σ (desvío bajo)") :
+     (zScore > 0 ? "Por encima de +2σ (extremo alto)" : "Por debajo de -2σ (extremo bajo)")
+
+// ============================================================
+// CAPA DE CACHÉ (igual que la versión anterior):
+// Los valores válidos quedan guardados en variables "var", que
+// persisten de barra en barra, así nunca se muestra "NaN".
+// "canUpdate" decide si la tabla se refresca en cada tick o
+// solo cuando cierra la barra (según el input liveUpdate).
+// ============================================================
+var float corrDisp         = na
+var float r2Disp           = na
+var int   lenDisp          = 0
+var float betaDisp         = na
+var float alphaDisp        = na
+var float avgCorrHistDisp  = na
+var float ratioDisp        = na
+var float ratioPctRankDisp = na
+var float ratioStdDevDisp  = na
+var float zScoreDisp       = na
+var float corr2Disp        = na
+var float r2_2Disp         = na
+
+canUpdate = liveUpdate or barstate.isconfirmed or not barstate.isrealtime
+
+if canUpdate
+    if not na(corr)
+        corrDisp := corr
+        r2Disp   := r2
+        lenDisp  := len
+    if not na(beta)
+        betaDisp := beta
+    if not na(alpha)
+        alphaDisp := alpha
+    if not na(avgCorrHist)
+        avgCorrHistDisp := avgCorrHist
+    if not na(ratio)
+        ratioDisp := ratio
+    if not na(ratioPctRank)
+        ratioPctRankDisp := ratioPctRank
+    if not na(ratioStdDev)
+        ratioStdDevDisp := ratioStdDev
+    if not na(zScore)
+        zScoreDisp := zScore
+    if not na(corr2)
+        corr2Disp := corr2
+        r2_2Disp  := r2_2
+
+// === TABLA — TEMA DARK NATIVO DE TRADINGVIEW, HORIZONTAL Y PAREJA ===
+
+// Paleta calcada del tema oscuro de TradingView
+bgTable     = color.new(color.rgb(19, 23, 34), 85)    // #131722, casi transparente
+borderCol   = color.new(color.rgb(42, 46, 57), 60)     // #2A2E39, grid sutil
+textLabel   = color.new(color.rgb(120, 123, 134), 0)   // #787B86, gris de ejes/etiquetas
+textValue   = color.new(color.rgb(209, 212, 220), 0)   // #D1D4DC, texto estándar
+colPositive = color.new(color.rgb(38, 166, 154), 0)    // #26A69A, verde vela alcista
+colNegative = color.new(color.rgb(239, 83, 80), 0)     // #EF5350, rojo vela bajista
+colAccent   = color.new(color.rgb(41, 98, 255), 0)     // #2962FF, azul de acento TV
+colWarn     = color.new(color.rgb(255, 176, 32), 0)    // ámbar TV
+
+zColor = na(zScoreDisp) ? textLabel : math.abs(zScoreDisp) <= 1 ? colPositive : math.abs(zScoreDisp) <= 2 ? colWarn : colNegative
+
+totalCols = showCompare ? 14 : 12
+var table statsTable = table.new(tablePos, totalCols, 2, bgcolor=bgTable,
+     border_width=1, border_color=borderCol, frame_color=borderCol, frame_width=1)
+
+if barstate.islast
+    // --- Fila de etiquetas (todas mismo tamaño/color, parejas) ---
+    table.cell(statsTable, 0,  0, "ACTIVO A",   text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 1,  0, "ACTIVO B",   text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 2,  0, "BARRAS",     text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 3,  0, "CORR",       text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 4,  0, "R²",         text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 5,  0, "BETA",       text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 6,  0, "ALPHA %",    text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 7,  0, "CORR PROM",  text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 8,  0, "RATIO",      text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 9,  0, "PERCENTIL",  text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 10, 0, "DESV. STD",  text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    table.cell(statsTable, 11, 0, "Z-SCORE",    text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+    if showCompare
+        table.cell(statsTable, 12, 0, "CORR LARGA", text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+        table.cell(statsTable, 13, 0, "R² LARGA",   text_color=textLabel, text_size=labelSize, text_halign=text.align_center)
+
+    // --- Fila de valores (todas mismo tamaño, alineación pareja) ---
+    // NOTA: ahora todas las celdas usan los "Disp" cacheados, no los valores crudos.
+    // Así la tabla nunca muestra NaN mientras se reconstruye la ventana y queda
+    // 100% consistente con la capa de caché ya armada más arriba.
+    table.cell(statsTable, 0,  1, syminfo.ticker,                                  text_color=colAccent,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 1,  1, symB,                                            text_color=colAccent,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 2,  1, str.tostring(lenDisp),                           text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 3,  1, str.tostring(corrDisp, "#.###"),                 text_color=corrDisp >= 0 ? colPositive : colNegative, text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 4,  1, str.tostring(r2Disp, "#.###"),                   text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 5,  1, str.tostring(betaDisp, "#.###"),                 text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 6,  1, str.tostring(alphaDisp, "#.####"),               text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 7,  1, str.tostring(avgCorrHistDisp, "#.##"),           text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 8,  1, str.tostring(ratioDisp, "#.####"),               text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 9,  1, str.tostring(ratioPctRankDisp, "#.#") + "%",     text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 10, 1, str.tostring(ratioStdDevDisp, "#.####"),         text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
+    table.cell(statsTable, 11, 1, str.tostring(zScoreDisp, "#.##") + "σ",          text_color=zColor,       text_size=valueSize, text_halign=text.align_center)
+    if showCompare
+        table.cell(statsTable, 12, 1, str.tostring(corr2Disp, "#.###") + " (" + str.tostring(lenBars2) + ")", text_color=corr2Disp >= 0 ? colPositive : colNegative, text_size=valueSize, text_halign=text.align_center)
+        table.cell(statsTable, 13, 1, str.tostring(r2_2Disp, "#.###"),             text_color=textValue,   text_size=valueSize, text_halign=text.align_center)
